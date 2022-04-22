@@ -17,12 +17,10 @@ class WebApiServer {
 		this.app.use("/api", ApiRoutes);
 		this.app.use(errorMiddleware);
 
-		if (this.isProd) {
-			this.app.use(
-				express.static(path.join(__dirname, "../../client-app/build"))
-			);
+		if (this.isProd || true) {
+			this.app.use(express.static(path.join(__dirname, "../../../client-app")));
 			this.app.get("*", (req, res) => {
-				res.sendFile(path.join(__dirname, "client/build", "index.html"));
+				res.sendFile(path.join(__dirname, "../../../client-app", "index.html"));
 			});
 		}
 	}

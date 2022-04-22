@@ -1,6 +1,7 @@
 import moment from "moment";
 import { nanoid } from "nanoid";
-import { Device } from "../interfaces/device.interface";
+import { Device } from "../../interfaces/device.interface";
+import { generateDemoDevices } from "../../utils/utils";
 
 async function getAllDevices(): Promise<Device[]> {
 	return Promise.resolve(devices);
@@ -63,34 +64,4 @@ export default {
 	getDeviceId
 };
 
-let devices: Device[] = [
-	{
-		name: "Device A",
-		description: "a device...",
-		accessToken: "12345",
-		enabled: false,
-		id: "1337",
-		protocol: "http",
-		created: moment().subtract(1, "year").toDate(),
-		lastModified: moment().subtract(200, "days").toDate()
-	},
-	{
-		name: "Device B",
-		accessToken: "99999",
-		enabled: true,
-		id: "4567",
-		protocol: "coap",
-		created: moment().subtract(1, "day").toDate(),
-		lastModified: moment().subtract(1, "day").toDate()
-	},
-	{
-		name: "Device C",
-		description: "c device...",
-		accessToken: "foobar123",
-		enabled: true,
-		id: "111111",
-		protocol: "http",
-		created: moment().subtract(12, "day").toDate(),
-		lastModified: moment().subtract(5, "minute").toDate()
-	}
-];
+let devices = generateDemoDevices(20);

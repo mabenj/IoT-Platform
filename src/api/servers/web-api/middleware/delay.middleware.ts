@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import Config from "../../../configs/web-api.config";
-import { sleep } from "../../../utils/utils";
+import Config from "../../../../configs/web-api.config";
+import { sleep } from "../../../../utils/utils";
 
 async function delayMiddleware(
 	request: Request,

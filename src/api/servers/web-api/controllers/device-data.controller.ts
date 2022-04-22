@@ -1,7 +1,7 @@
-import { Response, Request } from "express";
+import { Request, Response } from "express";
 import DeviceDataService from "../../../services/device-data.service";
 
-async function getDeviceData(req: Request, res: Response) {
+async function getDeviceData(req: Request<{ id: string }>, res: Response) {
 	res.json(await DeviceDataService.getDeviceData(req.params.id));
 }
 

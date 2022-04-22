@@ -1,10 +1,10 @@
-import CoapApiConfig from "./configs/coap-api.config";
-import HttpApiConfig from "./configs/http-api.config";
-import WebApiConfig from "./configs/web-api.config";
+import CoapApiConfig from "../configs/coap-api.config";
+import HttpApiConfig from "../configs/http-api.config";
+import WebApiConfig from "../configs/web-api.config";
+import Log from "../utils/loggers";
 import CoapApiServer from "./servers/coap-api/server";
 import HttpApiServer from "./servers/http-api/server";
 import WebApiServer from "./servers/web-api/server";
-import Log from "./utils/loggers";
 
 const Logger = Log.app;
 

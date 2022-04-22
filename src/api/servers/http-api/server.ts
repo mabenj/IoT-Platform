@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import "express-async-errors";
+import { DeviceData } from "../../../interfaces/device-data.interface";
 import delayMiddleware from "./middleware/delay.middleware";
 import errorMiddleware from "./middleware/error.middleware";
 import loggerMiddleware from "./middleware/logger.middleware";
@@ -12,10 +13,7 @@ class HttpApiServer {
 		this.isProd = isProd;
 		this.app = express();
 		this.initializeMiddleware();
-		this.app.post("/:accessToken", (req: Request, res: Response) => {
-			// TODO
-			res.status(501).send("Not implemented");
-		});
+		this.initializeRoutes();
 		this.app.use(errorMiddleware);
 	}
 
@@ -27,6 +25,15 @@ class HttpApiServer {
 		this.app.use(express.json());
 		!this.isProd && this.app.use(delayMiddleware);
 		this.app.use(loggerMiddleware);
+	}
+
+	private initializeRoutes() {
+		this.app.post("/:accessToken", this.handlePost);
+	}
+
+	private handlePost(req: Request<{}, {}, DeviceData>, res: Response) {
+		// TODO
+		res.status(501).send("Not implemented");
 	}
 }
 
