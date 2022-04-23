@@ -2,19 +2,20 @@ import CoapApiConfig from "../configs/coap-api.config";
 import HttpApiConfig from "../configs/http-api.config";
 import WebApiConfig from "../configs/web-api.config";
 import Log from "../utils/loggers";
+import connect from "./db/connect";
 import CoapApiServer from "./servers/coap-api/server";
 import HttpApiServer from "./servers/http-api/server";
 import WebApiServer from "./servers/web-api/server";
 
 const Logger = Log.app;
 
-// TODO: interface to database
 class App {
 	private isProd = process.env.NODE_ENV?.trim() === "production";
 
 	constructor() {}
 
-	public start() {
+	public async start() {
+		await this.initializeDatabase();
 		new WebApiServer(this.isProd).listen(WebApiConfig.port, () => {
 			Logger.info(``);
 			Logger.info(`----------- Web API -------------`);
@@ -36,6 +37,17 @@ class App {
 			Logger.info(`----------------------------------`);
 			Logger.info(``);
 		});
+	}
+
+	private async initializeDatabase() {
+		Logger.info("Connecting to database");
+		await connect(
+			() => Logger.info("Database connected"),
+			(reason) => {
+				Logger.error(`Error happened while connecting to database: ${reason}`);
+				process.exit(1);
+			}
+		);
 	}
 }
 

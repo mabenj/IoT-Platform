@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { Device } from "../../../../interfaces/device.interface";
 import DeviceService from "../../../services/device.service";
-import Log from "../logger";
 
 async function getDevices(req: Request, res: Response) {
 	res.json(await DeviceService.getAllDevices());
@@ -12,24 +11,29 @@ async function getDevice(req: Request<{ id: string }>, res: Response) {
 }
 
 async function postDevice(req: Request<{}, {}, Device>, res: Response) {
-	try {
-		const newDevice = await DeviceService.addDevice(req.body);
-		res.status(201).json(newDevice);
-	} catch (err: any) {
-		let message =
-			"Error while registering device: " +
-			(err instanceof Error ? err.message : err);
-		Log.error(message);
-		res.status(500).send(message);
-	}
+	const newDevice = await DeviceService.addDevice(req.body);
+	res.status(201).json(newDevice);
 }
 
-async function deleteDevice(req: Request, res: Response) {
-	res.status(501).send("Not implemented");
+async function deleteDevice(req: Request<{ id: string }>, res: Response) {
+	await DeviceService.removeDevice(req.params.id);
+	res.status(204).send();
 }
 
-async function putDevice(req: Request<{}, {}, Device>, res: Response) {
-	res.status(501).send("Not implemented");
+async function putDevice(
+	req: Request<{ id: string }, {}, Device>,
+	res: Response
+) {
+	const newDevice = await DeviceService.modifyDevice(req.params.id, req.body);
+	res.status(201).json(newDevice);
+}
+
+function getErrorMessage(error: unknown) {
+	return error instanceof Error
+		? error.message
+		: typeof error === "string"
+		? error
+		: "Unknown error";
 }
 
 export default {

@@ -22,9 +22,19 @@ A simple and lightweight IoT platform made as part of Communication Technologies
 2. `yarn install` or `npm install`
 3. `yarn run dev` or `npm run dev`
 
+## Database Connection
+
+Connection to MongoDB requires the following in a `.env` file in the root directory
+
+`MONGO_USERNAME=<username>`
+
+`MONGO_PASSWORD=<password>`
+
+`MONGO_HOST=<host (e.g. cluster0.jrhsd.mongodb.net/iot-platform)>`
+
 ## Web API endpoints
 
-Web API port is defined in the `src/config/web-api.config.ts` file.
+Web API port is defined in the `src/configs/web-api.config.ts` file.
 
 ### /api/devices
 
@@ -44,12 +54,11 @@ Web API port is defined in the `src/config/web-api.config.ts` file.
     }
   ```
 
-- `PUT /api/devices`
+- `PUT /api/devices/{id}`
 
   ```
    Body:
    {
-       id: <string>,
        name?: <string>,
        accessToken?: <string>,
        enabled?: <boolean>,
@@ -67,7 +76,7 @@ Web API port is defined in the `src/config/web-api.config.ts` file.
 
 ## HTTP API endpoints
 
-HTTP API port is defined in the `src/config/http-api.config.ts` file.
+HTTP API port is defined in the `src/configs/http-api.config.ts` file.
 
 - `POST /{accessToken}`
 
@@ -80,7 +89,7 @@ HTTP API port is defined in the `src/config/http-api.config.ts` file.
 
 ## CoAP API endpoints
 
-CoAP API port is defined in the `src/config/coap-api.config.ts` file.
+CoAP API port is defined in the `src/configs/coap-api.config.ts` file.
 
 - `POST /{accessToken}`
 

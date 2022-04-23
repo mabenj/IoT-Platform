@@ -1,34 +1,25 @@
-import moment from "moment";
-import { nanoid } from "nanoid";
-import { DeviceData } from "../../interfaces/device-data.interface";
-import { generateRandomDeviceData } from "../../utils/utils";
+import { DeviceData as IDeviceData } from "../../interfaces/device-data.interface";
+import DeviceData from "../../models/device-data.model";
 import DeviceService from "./device.service";
 
-async function getDeviceData(deviceId: string): Promise<DeviceData[]> {
-	return Promise.resolve(
-		deviceData.filter((deviceData) => deviceData.deviceId === deviceId)
-	);
+async function getDeviceData(deviceId: string): Promise<IDeviceData[]> {
+	const deviceData = await DeviceData.find({ deviceId: deviceId }).exec();
+	return Promise.resolve(deviceData ? deviceData : []);
 }
 
 async function addDeviceData(
 	accessToken: string,
 	data: any
-): Promise<DeviceData> {
-	const newDeviceDatum: DeviceData = {
-		guid: nanoid(),
+): Promise<IDeviceData> {
+	const newDeviceDatum = await new DeviceData({
 		deviceId: await DeviceService.getDeviceId(accessToken),
-		timestamp: moment().toDate(),
 		data: data
-	};
-	deviceData.push(newDeviceDatum);
+	}).save();
 	return Promise.resolve(newDeviceDatum);
 }
 
-async function removeDeviceData(deviceId: string): Promise<boolean> {
-	deviceData = deviceData.filter(
-		(deviceDatum) => deviceDatum.deviceId !== deviceId
-	);
-	return Promise.resolve(true);
+async function removeDeviceData(deviceId: string) {
+	await DeviceData.findOneAndRemove({ deviceId: deviceId }).exec();
 }
 
 export default {
@@ -36,15 +27,3 @@ export default {
 	addDeviceData,
 	removeDeviceData
 };
-
-let deviceData: DeviceData[] = [];
-generateDemoData();
-
-async function generateDemoData() {
-	deviceData = generateRandomDeviceData(
-		100,
-		(await DeviceService.getAllDevices())
-			.map(({ id }) => id || "")
-			.filter((id) => !!id)
-	);
-}

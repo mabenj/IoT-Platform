@@ -6,7 +6,7 @@ interface WebApiConfig {
 }
 
 const config: WebApiConfig = {
-	incomingRequestDelayMs: 300,
+	incomingRequestDelayMs: 0,
 	port: process.env.WEB_PORT || 7000
 };
 

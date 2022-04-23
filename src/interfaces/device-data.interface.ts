@@ -1,6 +1,8 @@
-export interface DeviceData {
+import { Document } from "mongoose";
+
+export interface DeviceData extends Document {
+	id: string;
 	data: { [key: string]: any };
-	guid?: string;
-	deviceId?: string;
-	timestamp?: Date;
+	deviceId: string;
+	createdAt: Date;
 }

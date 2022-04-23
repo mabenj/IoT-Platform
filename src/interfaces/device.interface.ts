@@ -1,10 +1,12 @@
-export interface Device {
+import { Document } from "mongoose";
+
+export interface Device extends Document {
+	id: string;
 	name: string;
 	accessToken: string;
 	enabled: boolean;
 	protocol: "http" | "coap";
-	id?: string;
-	created?: Date;
-	lastModified?: Date;
-	description?: string;
+	description: string;
+	createdAt: Date;
+	updatedAt: Date;
 }
