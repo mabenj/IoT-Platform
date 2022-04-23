@@ -22,10 +22,10 @@ export default function ViewDevices() {
 							<strong>Access token:</strong> {device.accessToken}
 						</div>
 						<div>
-							<strong>Created:</strong> {device.created?.toString()}
+							<strong>Created:</strong> {device.createdAt?.toString()}
 						</div>
 						<div>
-							<strong>Last modified:</strong> {device.lastModified?.toString()}
+							<strong>Last modified:</strong> {device.updatedAt?.toString()}
 						</div>
 						<div>
 							<strong>Protocol:</strong> {device.protocol}

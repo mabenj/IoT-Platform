@@ -1,18 +1,18 @@
 import { ConnectOptions } from "mongoose";
 
-const mongoOptions: ConnectOptions = {
+const MONGO_OPTIONS: ConnectOptions = {
 	socketTimeoutMS: 30000
 };
-const mongoUsername = process.env.MONGO_USERNAME || "";
-const mongoPassword = process.env.MONGO_PASSWORD || "";
-const mongoHost = process.env.MONGO_HOST || "";
+const MONGO_USERNAME = process.env.MONGO_USERNAME || "";
+const MONGO_PASSWORD = process.env.MONGO_PASSWORD || "";
+const MONGO_HOST = process.env.MONGO_HOST || "";
 
 const MongoConfig = {
-	host: mongoHost,
-	username: mongoUsername,
-	password: mongoPassword,
-	options: mongoOptions,
-	url: `mongodb+srv://${mongoUsername}:${mongoPassword}@${mongoHost}`
+	host: MONGO_HOST,
+	username: MONGO_USERNAME,
+	password: MONGO_PASSWORD,
+	options: MONGO_OPTIONS,
+	url: `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}`
 };
 
 export default MongoConfig;

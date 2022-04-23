@@ -1,6 +1,4 @@
-import { Document } from "mongoose";
-
-export interface Device extends Document {
+export interface Device {
 	id: string;
 	name: string;
 	accessToken: string;
