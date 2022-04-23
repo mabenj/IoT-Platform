@@ -17,7 +17,7 @@ class WebApiServer {
 		this.app.use("/api", ApiRoutes);
 		this.app.use(errorMiddleware);
 
-		if (this.isProd || true) {
+		if (this.isProd) {
 			this.app.use(express.static(path.join(__dirname, "../../../client-app")));
 			this.app.get("*", (req, res) => {
 				res.sendFile(path.join(__dirname, "../../../client-app", "index.html"));

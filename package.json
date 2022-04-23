@@ -1,11 +1,12 @@
 {
 	"scripts": {
 		"build": "npx tsc && cd src/client-app/ && npm run build",
-		"start": "node dist/api/app.js",
+		"start": "cross-env NODE_ENV=production node dist/api/app.js",
 		"dev": "nodemon src/api/app.ts"
 	},
 	"dependencies": {
 		"coap": "^1.0.5",
+		"cross-env": "^7.0.3",
 		"dotenv": "^16.0.0",
 		"express": "^4.17.3",
 		"express-async-errors": "^3.1.1",

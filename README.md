@@ -13,6 +13,13 @@ A simple and lightweight IoT platform made as part of Communication Technologies
 
 1. `git clone`
 2. `yarn install` or `npm install`
+3. `yarn build` or `npm build`
+4. `yarn start` or `npm start`
+
+## Development
+
+1. `git clone`
+2. `yarn install` or `npm install`
 3. `yarn run dev` or `npm run dev`
 
 ## Web API endpoints
