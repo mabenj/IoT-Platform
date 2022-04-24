@@ -1,17 +1,23 @@
 import React from "react";
 import ListGroup from "react-bootstrap/ListGroup";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
 export default function Sidenav() {
-	const navigate = useNavigate();
 	return (
 		<ListGroup style={{ position: "fixed", width: "20%" }}>
-			<ListGroup.Item action onClick={() => navigate("/viewDevices")}>
-				View Devices
-			</ListGroup.Item>
-			<ListGroup.Item action onClick={() => navigate("/registerDevice")}>
-				Register a Device
-			</ListGroup.Item>
+			<CustomListGroupItem to="/viewDevices" label="View Devices" />
+			<CustomListGroupItem to="/registerDevice" label="Register a Device" />
 		</ListGroup>
 	);
 }
+
+const CustomListGroupItem = ({ to, label }: { to: string; label: string }) => {
+	const navigate = useNavigate();
+	let resolved = useResolvedPath(to);
+	let match = useMatch({ path: resolved.pathname, end: true });
+	return (
+		<ListGroup.Item action active={!!match} onClick={() => navigate(to)}>
+			{label}
+		</ListGroup.Item>
+	);
+};
