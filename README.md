@@ -19,8 +19,19 @@ A simple and lightweight IoT platform made as part of Communication Technologies
 ## Development
 
 1. `git clone`
-2. `yarn install` or `npm install`
-3. `yarn run dev` or `npm run dev`
+2. **Back-end**
+
+   2.1 `yarn install` or `npm install`
+
+   2.2 `yarn run dev` or `npm run dev`
+
+3. **Front-end**
+
+   3.1 `cd src/client-app`
+
+   3.2 `yarn install` or `npm install`
+
+   3.3 `yarn start` or `npm start`
 
 ## Database Connection
 

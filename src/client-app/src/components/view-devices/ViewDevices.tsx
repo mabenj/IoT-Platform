@@ -7,7 +7,6 @@ export default function ViewDevices() {
 
 	useEffect(() => {
 		async function fetchDevices() {
-			console.log("fetch");
 			setCurrentDevices(await DeviceService.getAllDevices());
 		}
 		fetchDevices();

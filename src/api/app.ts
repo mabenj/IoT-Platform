@@ -40,7 +40,7 @@ class App {
 	}
 
 	private async initializeDatabase() {
-		Logger.info("Connecting to database");
+		Logger.info("Initializing database");
 		await connect(
 			() => Logger.info("Database connected"),
 			(reason) => {

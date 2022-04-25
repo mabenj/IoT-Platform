@@ -11,7 +11,12 @@ export default function Sidenav() {
 	);
 }
 
-const CustomListGroupItem = ({ to, label }: { to: string; label: string }) => {
+interface CustomListGroupItemProps {
+    to: string;
+    label: string;
+}
+
+const CustomListGroupItem = ({ to, label }: CustomListGroupItemProps) => {
 	const navigate = useNavigate();
 	let resolved = useResolvedPath(to);
 	let match = useMatch({ path: resolved.pathname, end: true });

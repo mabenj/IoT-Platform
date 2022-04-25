@@ -15,6 +15,7 @@ async function getDevice(deviceId: string): Promise<IDevice> {
 }
 
 async function addDevice(device: IDevice): Promise<IDevice> {
+	// TODO: validate device.accessToken format (a-zA-Z0-9{8,})
 	const newDevice = await new Device(device).save();
 	return Promise.resolve(newDevice);
 }
