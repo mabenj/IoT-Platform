@@ -1,20 +1,25 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Device } from "../../../../interfaces/device.interface";
+import DeviceService from "../../services/DeviceService";
 
 export default function ViewDevices() {
-	const [devices, setDevices] = useState<Device[]>([]);
+	const [currentDevices, setCurrentDevices] = useState<Device[]>([]);
 
 	useEffect(() => {
-		axios.get("/api/devices").then(({ data }) => setDevices(data));
+		async function fetchDevices() {
+			console.log("fetch");
+			setCurrentDevices(await DeviceService.getAllDevices());
+		}
+		fetchDevices();
 	}, []);
-
 	return (
 		<>
-			<h3>Current devices</h3>
-			{devices.map((device, index) => {
+			<h2 className="mb-5">Current Devices</h2>
+			{currentDevices.map((device, index) => {
 				return (
-					<div key={index} className="mb-5">
+					<div
+						key={index}
+						className="mb-5 p-4 bg-light bg-gradient border rounded">
 						<div>
 							<strong>Name:</strong> {device.name}
 						</div>

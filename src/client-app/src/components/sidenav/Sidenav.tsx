@@ -17,7 +17,7 @@ const CustomListGroupItem = ({ to, label }: { to: string; label: string }) => {
 	let match = useMatch({ path: resolved.pathname, end: true });
 	return (
 		<ListGroup.Item action active={!!match} onClick={() => navigate(to)}>
-			{label}
+			<span>{label}</span>
 		</ListGroup.Item>
 	);
 };
