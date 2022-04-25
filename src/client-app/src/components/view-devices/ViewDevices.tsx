@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Placeholder from "react-bootstrap/Placeholder";
+import Spinner from "react-bootstrap/Spinner";
 import { Device } from "../../../../interfaces/device.interface";
 import DeviceService from "../../services/DeviceService";
 
@@ -16,7 +17,10 @@ export default function ViewDevices() {
 	}, []);
 	return (
 		<>
-			<h2 className="mb-5">Current Devices</h2>
+			<div className="mb-5">
+				<h2 className="d-inline">Current Devices</h2>
+				{isLoading && <Spinner animation="border" className="mx-3" />}
+			</div>
 			{isLoading && PLACE_HOLDERS.map((placeholder) => placeholder)}
 			{currentDevices.map((device, index) => {
 				return (
