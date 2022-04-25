@@ -56,25 +56,25 @@ const PlaceholderComponent = () => {
 		<div className="mb-5 p-4 bg-light bg-gradient border rounded">
 			<Placeholder animation="glow">
 				<div>
-					<Placeholder xs={2} /> <Placeholder xs={4} />
+					<Placeholder xs={1} />
 				</div>
 				<div>
-					<Placeholder xs={4} /> <Placeholder xs={4} />
+					<Placeholder xs={2} />
 				</div>
 				<div>
-					<Placeholder xs={3} /> <Placeholder xs={4} />
+					<Placeholder xs={1} />
 				</div>
 				<div>
-					<Placeholder xs={4} /> <Placeholder xs={4} />
+					<Placeholder xs={2} />
 				</div>
 				<div>
-					<Placeholder xs={3} /> <Placeholder xs={2} />
+					<Placeholder xs={1} />
 				</div>
 				<div>
-					<Placeholder xs={4} /> <Placeholder xs={4} />
+					<Placeholder xs={2} />
 				</div>
 				<div>
-					<Placeholder xs={2} /> <Placeholder xs={2} />
+					<Placeholder xs={1} />
 				</div>
 			</Placeholder>
 		</div>
