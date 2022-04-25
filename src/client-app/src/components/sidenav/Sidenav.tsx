@@ -12,14 +12,14 @@ export default function Sidenav() {
 }
 
 interface CustomListGroupItemProps {
-    to: string;
-    label: string;
+	to: string;
+	label: string;
 }
 
 const CustomListGroupItem = ({ to, label }: CustomListGroupItemProps) => {
 	const navigate = useNavigate();
-	let resolved = useResolvedPath(to);
-	let match = useMatch({ path: resolved.pathname, end: true });
+	const resolved = useResolvedPath(to);
+	const match = useMatch({ path: resolved.pathname, end: false });
 	return (
 		<ListGroup.Item action active={!!match} onClick={() => navigate(to)}>
 			<span>{label}</span>
