@@ -1,11 +1,12 @@
-import NotFound from "../components/NotFound";
 import Home from "../components/Home";
+import NotFound from "../components/NotFound";
 import RegisterDevice from "../components/RegisterDevice";
 import ViewDevice from "../components/ViewDevice";
 import ViewDevices from "../components/ViewDevices";
 
 const Routes = [
 	{ path: "/", breadcrumb: "Home", isIndex: true, Component: Home },
+	{ path: "/home", breadcrumb: "Home", Component: Home },
 	{ path: "/viewDevices", breadcrumb: "View Devices", Component: ViewDevices },
 	{
 		path: "/viewDevices/:deviceId",

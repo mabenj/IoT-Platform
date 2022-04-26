@@ -20,6 +20,10 @@ a {
 	text-decoration: underline;
 }
 
+.hover-filter:hover {
+	filter: grayscale(10%);
+}
+
 .overflow-y-scroll {
 	overflow-y: scroll;
 }

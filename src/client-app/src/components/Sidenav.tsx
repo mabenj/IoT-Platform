@@ -7,6 +7,7 @@ export default function Sidenav() {
 	return (
 		<Card style={{ position: "fixed", width: "20%" }}>
 			<ListGroup variant="flush">
+				<CustomListGroupItem to="/" label="Home" matchExact />
 				<CustomListGroupItem to="/viewDevices" label="View Devices" />
 				<CustomListGroupItem to="/registerDevice" label="Register a Device" />
 			</ListGroup>
@@ -17,12 +18,17 @@ export default function Sidenav() {
 interface CustomListGroupItemProps {
 	to: string;
 	label: string;
+	matchExact?: boolean;
 }
 
-const CustomListGroupItem = ({ to, label }: CustomListGroupItemProps) => {
+const CustomListGroupItem = ({
+	to,
+	label,
+	matchExact
+}: CustomListGroupItemProps) => {
 	const navigate = useNavigate();
 	const resolved = useResolvedPath(to);
-	const match = useMatch({ path: resolved.pathname, end: false });
+	const match = useMatch({ path: resolved.pathname, end: matchExact });
 	return (
 		<ListGroup.Item action active={!!match} onClick={() => navigate(to)}>
 			<span>{label}</span>
