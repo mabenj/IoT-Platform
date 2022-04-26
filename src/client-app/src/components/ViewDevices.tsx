@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
 import Placeholder from "react-bootstrap/Placeholder";
@@ -19,6 +20,7 @@ export default function ViewDevices() {
 		}
 		fetchDevices();
 	}, []);
+
 	return (
 		<>
 			<div className="mb-5">
@@ -31,6 +33,16 @@ export default function ViewDevices() {
 				{sortAlphabetically(currentDevices, "name").map((device) => (
 					<DeviceItem key={device.id} device={device} />
 				))}
+				{currentDevices.length < 1 && !isLoading && (
+					<Alert variant="warning">
+						No registered devices could be found — Register a new device{" "}
+						<Alert.Link as="span">
+							<Link to="/registerDevice" className="text-reset hover-underline">
+								here
+							</Link>
+						</Alert.Link>
+					</Alert>
+				)}
 			</ListGroup>
 		</>
 	);
@@ -43,7 +55,10 @@ interface DeviceCardProps {
 const DeviceItem = ({ device }: DeviceCardProps) => {
 	return (
 		<ListGroup.Item action>
-			<Link to={`/viewDevices/${device.id}`} state={{ device }}>
+			<Link
+				to={`/viewDevices/${device.id}`}
+				state={{ device }}
+				title={device.description}>
 				<span className="d-flex justify-content-between p-2">
 					<span>
 						<span className="hover-underline">{device.name}</span>
