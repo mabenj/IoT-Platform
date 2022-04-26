@@ -1,5 +1,5 @@
 import { DeviceData as IDeviceData } from "../../interfaces/device-data.interface";
-import DeviceData from "../../models/device-data.model";
+import DeviceData from "../models/device-data.model";
 import DeviceService from "./device.service";
 
 async function getDeviceData(deviceId: string): Promise<IDeviceData[]> {

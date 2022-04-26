@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { Device } from "../interfaces/device.interface";
+import { Device } from "../../interfaces/device.interface";
 
 const DeviceSchema: Schema = new Schema(
 	{

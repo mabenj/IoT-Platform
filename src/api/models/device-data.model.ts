@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { DeviceData } from "../interfaces/device-data.interface";
+import { DeviceData } from "../../interfaces/device-data.interface";
 
 const DeviceDataSchema: Schema = new Schema(
 	{

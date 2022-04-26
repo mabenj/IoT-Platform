@@ -1,3 +1,3 @@
-import Logger from "../../../utils/loggers";
+import Logger from "../../utils/loggers";
 
 export default Logger.httpApi;

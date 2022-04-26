@@ -1,5 +1,5 @@
 import { Device as IDevice } from "../../interfaces/device.interface";
-import Device from "../../models/device.model";
+import Device from "../models/device.model";
 
 async function getAllDevices(): Promise<IDevice[]> {
 	const result = await Device.find().exec();
