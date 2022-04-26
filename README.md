@@ -11,7 +11,7 @@ A simple and lightweight IoT platform made as part of _Communication Technologie
 ## Installation
 
 1. `git clone`
-2. Configure MongoDB connection (see [Database Connection](#mongo-connection))
+2. Configure MongoDB connection (see [Database Connection](#database-connection))
 3. `npm install`
 4. `npm run build`
 5. `npm start`
@@ -21,7 +21,7 @@ A simple and lightweight IoT platform made as part of _Communication Technologie
 1. `git clone`
 2. **Back-end**
 
-   2.1 Configure MongoDB connection (see [Database Connection](#mongo-connection))
+   2.1 Configure MongoDB connection (see [Database Connection](#database-connection))
 
    2.2 `npm install`
 
@@ -35,7 +35,7 @@ A simple and lightweight IoT platform made as part of _Communication Technologie
 
    3.3 `npm start`
 
-## Database Connection {#mongo-connection}
+## Database Connection
 
 Connection to MongoDB requires the following entries in a `.env` file in the root directory
 
@@ -47,7 +47,7 @@ Connection to MongoDB requires the following entries in a `.env` file in the roo
 
 ## Web API endpoints
 
-[Web API port is defined in the Web API config file](src/api/configs/web-api.config.ts)
+Web API port can be configured with a `WEB_PORT` environment variable in the `.env` file. (Default 7000)
 
 ### /api/devices
 
@@ -158,7 +158,7 @@ Connection to MongoDB requires the following entries in a `.env` file in the roo
 
 ## HTTP API endpoints
 
-[HTTP API port is defined in the HTTP API config file](src/api/configs/http-api.config.ts)
+HTTP API port can be configured with a `HTTP_PORT` environment variable in the `.env` file. (Default 7100)
 
 - `POST /{accessToken}`
 
@@ -171,7 +171,7 @@ Connection to MongoDB requires the following entries in a `.env` file in the roo
 
 ## CoAP API endpoints
 
-[CoAP API port is defined in the CoAP API config file](src/api/configs/coap-api.config.ts)
+CoAP API port can be configured with a `COAP_PORT` environment variable in the `.env` file. (Default 7200)
 
 - `POST /{accessToken}`
 
