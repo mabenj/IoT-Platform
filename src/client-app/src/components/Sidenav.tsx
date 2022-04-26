@@ -1,17 +1,18 @@
 import React from "react";
-import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import { useMatch, useNavigate, useResolvedPath } from "react-router-dom";
 
-export default function Sidenav() {
+interface SidenavProps {
+	className?: string;
+}
+
+export default function Sidenav({ className }: SidenavProps) {
 	return (
-		<Card style={{ position: "fixed", width: "20%" }}>
-			<ListGroup variant="flush">
-				<CustomListGroupItem to="/" label="Home" matchExact />
-				<CustomListGroupItem to="/viewDevices" label="View Devices" />
-				<CustomListGroupItem to="/registerDevice" label="Register a Device" />
-			</ListGroup>
-		</Card>
+		<ListGroup className={`mx-2 ${className}`}>
+			<CustomListGroupItem to="/" label="Home" matchExact />
+			<CustomListGroupItem to="/viewDevices" label="View Devices" />
+			<CustomListGroupItem to="/registerDevice" label="Register a Device" />
+		</ListGroup>
 	);
 }
 

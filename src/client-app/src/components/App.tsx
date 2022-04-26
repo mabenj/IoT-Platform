@@ -1,5 +1,4 @@
 import React from "react";
-import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -12,15 +11,11 @@ function App() {
 		<Router>
 			<Container fluid>
 				<Row className="mt-5">
-					<Col xs={3}>
-						<Sidenav />
-					</Col>
-					<Col>
-						<Container>
-							<Breadcrumb />
-							<MainContent />
-						</Container>
-					</Col>
+					<Sidenav className="sidenav" />
+					<main className="main-content">
+						<Breadcrumb />
+						<MainContent />
+					</main>
 				</Row>
 			</Container>
 		</Router>
