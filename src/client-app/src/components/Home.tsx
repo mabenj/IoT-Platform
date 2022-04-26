@@ -3,7 +3,7 @@ import React from "react";
 export default function Home() {
 	return (
 		<>
-			<h1>IoT-Platform</h1>
+			<h1>IoT Platform</h1>
 			<span>
 				<span className="mdi mdi-github"></span>
 				<a

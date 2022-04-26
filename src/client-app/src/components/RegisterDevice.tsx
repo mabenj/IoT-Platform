@@ -3,6 +3,7 @@ import React, { FormEvent, useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import Spinner from "react-bootstrap/Spinner";
 import { useNavigate } from "react-router-dom";
 import DeviceService from "../services/DeviceService";
 
@@ -13,6 +14,7 @@ const nanoid = customAlphabet(ACCESS_TOKEN_ALPHABET, 10);
 
 export default function RegisterDevice() {
 	const [validated, setValidated] = useState(false);
+	const [isRegistering, setIsRegistering] = useState(false);
 	const accessTokenInputRef = useRef<HTMLInputElement>(null);
 	const navigate = useNavigate();
 
@@ -31,6 +33,7 @@ export default function RegisterDevice() {
 			deviceProtocol,
 			deviceAccessToken
 		} = form.elements as any;
+		setIsRegistering(true);
 		const newDevice = await DeviceService.registerDevice({
 			name: deviceName.value,
 			accessToken: deviceAccessToken.value,
@@ -38,6 +41,7 @@ export default function RegisterDevice() {
 			enabled: deviceEnabled.checked,
 			protocol: deviceProtocol.value
 		});
+		setIsRegistering(false);
 		navigate(`/viewDevices/${newDevice.id}`, { state: { device: newDevice } });
 	};
 
@@ -65,7 +69,12 @@ export default function RegisterDevice() {
 						Device Name
 						<Required />
 					</Form.Label>
-					<Form.Control type="text" placeholder="Enter a name" required />
+					<Form.Control
+						type="text"
+						placeholder="Enter a name"
+						required
+						disabled={isRegistering}
+					/>
 					<Form.Control.Feedback type="invalid">
 						Provide a name
 					</Form.Control.Feedback>
@@ -73,7 +82,11 @@ export default function RegisterDevice() {
 
 				<Form.Group className="mb-4" controlId="deviceDescription">
 					<Form.Label>Description</Form.Label>
-					<Form.Control as="textarea" placeholder="Enter a description" />
+					<Form.Control
+						as="textarea"
+						placeholder="Enter a description"
+						disabled={isRegistering}
+					/>
 				</Form.Group>
 
 				<Form.Group className="mb-4" controlId="deviceDescription">
@@ -84,6 +97,7 @@ export default function RegisterDevice() {
 						id="deviceEnabled"
 						label=""
 						defaultChecked
+						disabled={isRegistering}
 					/>
 				</Form.Group>
 
@@ -99,6 +113,7 @@ export default function RegisterDevice() {
 							defaultChecked
 							required
 							value="http"
+							disabled={isRegistering}
 						/>
 						<Form.Check
 							inline
@@ -108,6 +123,7 @@ export default function RegisterDevice() {
 							label="CoAP"
 							required
 							value="coap"
+							disabled={isRegistering}
 						/>
 					</div>
 					<Form.Text muted>
@@ -127,17 +143,20 @@ export default function RegisterDevice() {
 							placeholder="Enter an access token"
 							required
 							pattern="[a-zA-Z0-9]{8,}"
+							disabled={isRegistering}
 						/>
 						<Button
 							variant="outline-secondary"
 							onClick={() => generateAccessToken()}
-							title="Generate access token">
+							title="Generate access token"
+							disabled={isRegistering}>
 							<span className="mdi mdi-refresh"></span>
 						</Button>
 						<Button
 							variant="outline-secondary"
 							onClick={() => copyAccessToken()}
-							title="Copy to clipboard">
+							title="Copy to clipboard"
+							disabled={isRegistering}>
 							<span className="mdi mdi-content-copy"></span>
 						</Button>
 						<Form.Control.Feedback type="invalid">
@@ -151,8 +170,13 @@ export default function RegisterDevice() {
 					</Form.Text>
 				</Form.Group>
 
-				<Button variant="primary" type="submit">
-					<span className="mdi mdi-login-variant"></span> Register Device
+				<Button variant="primary" type="submit" disabled={isRegistering}>
+					{isRegistering ? (
+						<Spinner animation="border" size="sm" />
+					) : (
+						<span className="mdi mdi-login-variant"></span>
+					)}{" "}
+					Register Device
 				</Button>
 				<Button
 					variant="secondary"
