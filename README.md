@@ -11,9 +11,9 @@ A simple and lightweight IoT platform made as part of _Communication Technologie
 ## Installation
 
 1. `git clone`
-2. Configure MongoDB connection (see [Database Connection](#database-connection))
-3. `npm install`
-4. `npm run build`
+2. `npm install`
+3. `npm run build`
+4. Configure MongoDB connection (see [Database Connection](#database-connection))
 5. `npm start`
 
 ## Development
@@ -21,9 +21,9 @@ A simple and lightweight IoT platform made as part of _Communication Technologie
 1. `git clone`
 2. **Back-end**
 
-   2.1 Configure MongoDB connection (see [Database Connection](#database-connection))
+   2.1 `npm install`
 
-   2.2 `npm install`
+   2.2 Configure MongoDB connection (see [Database Connection](#database-connection))
 
    2.3 `npm run dev`
 
@@ -43,7 +43,7 @@ Connection to MongoDB requires the following entries in a `.env` file in the roo
 
 `MONGO_PASSWORD=<password>`
 
-`MONGO_HOST=<host (e.g. cluster0.jrhsd.mongodb.net/iot-platform)>`
+`MONGO_HOST=<host (e.g. cluster1337.foobar.mongodb.net/iot-platform)>`
 
 ## Web API endpoints
 
@@ -146,12 +146,15 @@ Web API port can be configured with a `WEB_PORT` environment variable in the `.e
 
 ```
   Response Body:
-  {
-     id: <string>
-     deviceId: <string>,
-     createdAt: Date
-     [key: <string>]: any,
-  }
+  [
+    {
+        id: <string>
+        deviceId: <string>,
+        createdAt: Date
+        [key: <string>]: any,
+    },
+    ...
+  ]
 ```
 
 - `DELETE /api/deviceData/{id}`
