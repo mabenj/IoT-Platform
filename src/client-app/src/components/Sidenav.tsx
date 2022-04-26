@@ -11,9 +11,22 @@ export default function Sidenav({ className }: SidenavProps) {
 		<div
 			className={`mx-2 d-flex flex-column justify-content-between ${className}`}>
 			<ListGroup>
-				<CustomListGroupItem to="/" label="Home" matchExact />
-				<CustomListGroupItem to="/viewDevices" label="View Devices" />
-				<CustomListGroupItem to="/registerDevice" label="Register a Device" />
+				<CustomListGroupItem
+					to="/"
+					label="Home"
+					matchExact
+					mdiIcon="mdi mdi-home"
+				/>
+				<CustomListGroupItem
+					to="/viewDevices"
+					label="View Devices"
+					mdiIcon="mdi mdi-lan"
+				/>
+				<CustomListGroupItem
+					to="/registerDevice"
+					label="Register a Device"
+					mdiIcon="mdi mdi-database-plus"
+				/>
 			</ListGroup>
 			<span className="mb-4">
 				<span className="mdi mdi-github"></span>
@@ -32,12 +45,14 @@ export default function Sidenav({ className }: SidenavProps) {
 interface CustomListGroupItemProps {
 	to: string;
 	label: string;
+	mdiIcon: string;
 	matchExact?: boolean;
 }
 
 const CustomListGroupItem = ({
 	to,
 	label,
+	mdiIcon,
 	matchExact = false
 }: CustomListGroupItemProps) => {
 	const resolved = useResolvedPath(to);
@@ -48,7 +63,7 @@ const CustomListGroupItem = ({
 				to={to}
 				className="text-reset d-inline-block p-2"
 				style={{ width: "100%", height: "100%" }}>
-				{label}
+				<span className={`me-2 ${mdiIcon}`}></span> {label}
 			</Link>
 		</ListGroup.Item>
 	);
