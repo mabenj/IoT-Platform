@@ -43,7 +43,7 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ## Database Connection
 
-Connection to MongoDB requires the following entries in the `.env` file
+Connection to MongoDB requires the following entries in a `.env` file located in the root directory
 
 `MONGO_USERNAME=<username>`
 
