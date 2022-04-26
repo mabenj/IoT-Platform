@@ -2,6 +2,10 @@
 
 A simple and lightweight IoT platform made as part of _Communication Technologies and Security in IoT_ course.
 
+The backend APIs are written in TypeScript using [Node.js](https://nodejs.org/en/docs/) and [Express](https://expressjs.com/en/4x/api.html). Database access is handled with [Mongoose](https://mongoosejs.com/docs/guide.html). And [node-coap](https://github.com/mcollina/node-coap) library, alongside with Express, is used to handle the CoAP traffic coming from end-devices.
+
+The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/documentation-intro) application written also in TypeScript. The UI components used are mainly provided by [React-Bootstrap](https://react-bootstrap.github.io/getting-started/introduction/).
+
 ## Prerequisites
 
 - node and npm
