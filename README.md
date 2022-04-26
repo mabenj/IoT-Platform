@@ -1,29 +1,31 @@
 # IoT-Platform
 
-A simple and lightweight IoT platform made as part of Communication Technologies and Security in IoT course.
+A simple and lightweight IoT platform made as part of _Communication Technologies and Security in IoT_ course.
 
 ## Prerequisites
 
-- node
-- npm or yarn
+- node and npm
 - TypeScript
   `npm install -g typescript`
 
 ## Installation
 
 1. `git clone`
-2. `npm install`
-3. `npm run build`
-4. `npm start`
+2. Configure MongoDB connection (see [Database Connection](#mongo-connection))
+3. `npm install`
+4. `npm run build`
+5. `npm start`
 
 ## Development
 
 1. `git clone`
 2. **Back-end**
 
-   2.1 `npm install`
+   2.1 Configure MongoDB connection (see [Database Connection](#mongo-connection))
 
-   2.2 `npm run dev`
+   2.2 `npm install`
+
+   2.3 `npm run dev`
 
 3. **Front-end**
 
@@ -33,9 +35,9 @@ A simple and lightweight IoT platform made as part of Communication Technologies
 
    3.3 `npm start`
 
-## Database Connection
+## Database Connection {#mongo-connection}
 
-Connection to MongoDB requires the following in a `.env` file in the root directory
+Connection to MongoDB requires the following entries in a `.env` file in the root directory
 
 `MONGO_USERNAME=<username>`
 
@@ -45,18 +47,49 @@ Connection to MongoDB requires the following in a `.env` file in the root direct
 
 ## Web API endpoints
 
-Web API port is defined in the `src/api/configs/web-api.config.ts` file.
+[Web API port is defined in the Web API config file](src/api/configs/web-api.config.ts)
 
 ### /api/devices
 
-- `GET /api/devices`
-
-- `GET /api/devices/{id}`
-
-- `POST /api/devices`
+- `GET /api/devices` Gets all the registered devices
 
   ```
-   Body:
+  Response Body:
+  {
+     id: <string>
+     name: <string>,
+     accessToken: <string>,
+     enabled: <boolean>,
+     protocol: "http" | "coap",
+     description: <string>,
+     createdAt: Date,
+     updatedAt: Date,
+  }
+  ```
+
+- `GET /api/devices/{id}` Gets a registered device that has the corresponding id
+
+  ```
+  Response Body:
+  [
+    {
+        id: <string>
+        name: <string>,
+        accessToken: <string>,
+        enabled: <boolean>,
+        protocol: "http" | "coap",
+        description: <string>,
+        createdAt: Date,
+        updatedAt: Date,
+    },
+    ...
+  ]
+  ```
+
+- `POST /api/devices` Registers a new device provided in the request body
+
+  ```
+   Request Body:
    {
        name: <string>,
        accessToken: <string>,
@@ -65,10 +98,24 @@ Web API port is defined in the `src/api/configs/web-api.config.ts` file.
     }
   ```
 
-- `PUT /api/devices/{id}`
+  ```
+  Response Body:
+  {
+     id: <string>
+     name: <string>,
+     accessToken: <string>,
+     enabled: <boolean>,
+     protocol: "http" | "coap",
+     description: <string>,
+     createdAt: Date,
+     updatedAt: Date,
+  }
+  ```
+
+- `PUT /api/devices/{id}` Modifies a registered device that has the corresponding id with the details provided in the body
 
   ```
-   Body:
+   Request Body:
    {
        name?: <string>,
        accessToken?: <string>,
@@ -77,17 +124,41 @@ Web API port is defined in the `src/api/configs/web-api.config.ts` file.
    }
   ```
 
-- `DELETE /api/device/{id}`
+  ```
+  Response Body:
+  {
+     id: <string>
+     name: <string>,
+     accessToken: <string>,
+     enabled: <boolean>,
+     protocol: "http" | "coap",
+     description: <string>,
+     createdAt: Date,
+     updatedAt: Date,
+  }
+  ```
+
+- `DELETE /api/device/{id}` Deletes a registered device that has the corresponding id
 
 ### /api/deviceData
 
-- `GET /api/deviceData/{id}`
+- `GET /api/deviceData/{id}` Gets all the device data associated with a device that has the corresponding id
+
+```
+  Response Body:
+  {
+     id: <string>
+     deviceId: <string>,
+     createdAt: Date
+     [key: <string>]: any,
+  }
+```
 
 - `DELETE /api/deviceData/{id}`
 
 ## HTTP API endpoints
 
-HTTP API port is defined in the `src/api/configs/http-api.config.ts` file.
+[HTTP API port is defined in the HTTP API config file](src/api/configs/http-api.config.ts)
 
 - `POST /{accessToken}`
 
@@ -100,7 +171,7 @@ HTTP API port is defined in the `src/api/configs/http-api.config.ts` file.
 
 ## CoAP API endpoints
 
-CoAP API port is defined in the `src/api/configs/coap-api.config.ts` file.
+[CoAP API port is defined in the CoAP API config file](src/api/configs/coap-api.config.ts)
 
 - `POST /{accessToken}`
 

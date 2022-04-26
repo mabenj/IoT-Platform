@@ -255,9 +255,10 @@ const LabelCol = ({ children }: LabelColProps) => {
 
 const Asterisk = () => {
 	return (
-		<strong className="text-primary" title="This is a required field">
-			*
-		</strong>
+		<sup
+			className="mdi mdi-asterisk text-primary"
+			title="This is a required field"
+			style={{ fontSize: "0.5rem" }}></sup>
 	);
 };
 
