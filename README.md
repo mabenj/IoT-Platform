@@ -38,6 +38,8 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
    3.2 `npm install`
 
    3.3 `npm start`
+   
+   3.4 View the UI in browser http://localhost:3000
 
 ## Database Connection
 
