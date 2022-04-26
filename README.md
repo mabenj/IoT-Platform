@@ -41,7 +41,7 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ## Database Connection
 
-Connection to MongoDB requires the following entries in a `.env` file in the root directory
+Connection to MongoDB requires the following entries in the `.env` file
 
 `MONGO_USERNAME=<username>`
 
@@ -51,7 +51,7 @@ Connection to MongoDB requires the following entries in a `.env` file in the roo
 
 ## Web API endpoints
 
-Web API port can be configured with a `WEB_PORT` environment variable in the `.env` file. (Default 7000)
+Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000)
 
 ### /api/devices
 
@@ -165,7 +165,7 @@ Web API port can be configured with a `WEB_PORT` environment variable in the `.e
 
 ## HTTP API endpoints
 
-HTTP API port can be configured with a `HTTP_PORT` environment variable in the `.env` file. (Default 7100)
+HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 7100)
 
 - `POST /{accessToken}`
 
@@ -178,7 +178,7 @@ HTTP API port can be configured with a `HTTP_PORT` environment variable in the `
 
 ## CoAP API endpoints
 
-CoAP API port can be configured with a `COAP_PORT` environment variable in the `.env` file. (Default 7200)
+CoAP API port can be configured with `COAP_PORT` in the `.env` file. (Default 7200)
 
 - `POST /{accessToken}`
 
