@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { useNavigate } from "react-router-dom";
-import DeviceService from "../../services/DeviceService";
+import DeviceService from "../services/DeviceService";
 
 const ACCESS_TOKEN_ALPHABET =
 	"0123456789abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXY";
@@ -38,7 +38,7 @@ export default function RegisterDevice() {
 			enabled: deviceEnabled.checked,
 			protocol: deviceProtocol.value
 		});
-		navigate("/viewDevices");
+		navigate(`/viewDevices/${newDevice.id}`, { state: { device: newDevice } });
 	};
 
 	const generateAccessToken = () => {

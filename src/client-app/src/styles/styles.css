@@ -12,6 +12,14 @@ code {
 		monospace;
 }
 
+a {
+	text-decoration: none;
+}
+
+.hover-underline:hover {
+	text-decoration: underline;
+}
+
 .overflow-y-scroll {
 	overflow-y: scroll;
 }

@@ -2,7 +2,7 @@ import React from "react";
 import BootstrapBreadcrumb from "react-bootstrap/Breadcrumb";
 import { Link } from "react-router-dom";
 import useBreadcrumbs from "use-react-router-breadcrumbs";
-import Routes from "../../routes/routes";
+import Routes from "../routes/routes";
 
 export default function Breadcrumb() {
 	const breadcrumbs = useBreadcrumbs(Routes);

@@ -1,9 +1,22 @@
 import axios from "axios";
 import { Device } from "../../../interfaces/device.interface";
 
-async function getAllDevices() {
-	const response = await axios.get("/api/devices");
-	return response.data;
+async function getAllDevices(): Promise<Device[]> {
+	const response = await axios.get<Device[]>("/api/devices");
+	return response.data.map((device) => ({
+		...device,
+		createdAt: new Date(device.createdAt!),
+		updatedAt: new Date(device.updatedAt!)
+	}));
+}
+
+async function getDevice(deviceId: string): Promise<Device> {
+	const { data } = await axios.get<Device>(`/api/devices/${deviceId}`);
+	return {
+		...data,
+		createdAt: new Date(data.createdAt!),
+		updatedAt: new Date(data.updatedAt!)
+	};
 }
 
 async function registerDevice(device: Device) {
@@ -25,7 +38,8 @@ const DeviceService = {
 	getAllDevices,
 	registerDevice,
 	deleteDevice,
-	modifyDevice
+	modifyDevice,
+	getDevice
 };
 
 export default DeviceService;

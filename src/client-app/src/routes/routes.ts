@@ -1,8 +1,8 @@
-import NotFound from "../components/app/NotFound";
-import Home from "../components/home/Home";
-import RegisterDevice from "../components/register-device/RegisterDevice";
-import DeviceConfiguration from "../components/view-devices/DeviceConfiguration";
-import ViewDevices from "../components/view-devices/ViewDevices";
+import NotFound from "../components/NotFound";
+import Home from "../components/Home";
+import RegisterDevice from "../components/RegisterDevice";
+import ViewDevice from "../components/ViewDevice";
+import ViewDevices from "../components/ViewDevices";
 
 const Routes = [
 	{ path: "/", breadcrumb: "Home", isIndex: true, Component: Home },
@@ -10,7 +10,7 @@ const Routes = [
 	{
 		path: "/viewDevices/:deviceId",
 		breadcrumb: "Device Configuration",
-		Component: DeviceConfiguration
+		Component: ViewDevice
 	},
 	{
 		path: "/registerDevice",

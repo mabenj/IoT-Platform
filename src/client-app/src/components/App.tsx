@@ -3,10 +3,9 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import ClientRoutes from "../../routes/routes";
-import Breadcrumb from "../breadcrumb/Breadcrumb";
-import Sidenav from "../sidenav/Sidenav";
-import "./App.css";
+import ClientRoutes from "../routes/routes";
+import Breadcrumb from "./Breadcrumb";
+import Sidenav from "./Sidenav";
 
 function App() {
 	return (
