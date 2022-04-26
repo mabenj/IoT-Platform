@@ -45,7 +45,7 @@ Connection to MongoDB requires the following in a `.env` file in the root direct
 
 ## Web API endpoints
 
-Web API port is defined in the `src/configs/web-api.config.ts` file.
+Web API port is defined in the `src/api/configs/web-api.config.ts` file.
 
 ### /api/devices
 
@@ -87,7 +87,7 @@ Web API port is defined in the `src/configs/web-api.config.ts` file.
 
 ## HTTP API endpoints
 
-HTTP API port is defined in the `src/configs/http-api.config.ts` file.
+HTTP API port is defined in the `src/api/configs/http-api.config.ts` file.
 
 - `POST /{accessToken}`
 
@@ -100,7 +100,7 @@ HTTP API port is defined in the `src/configs/http-api.config.ts` file.
 
 ## CoAP API endpoints
 
-CoAP API port is defined in the `src/configs/coap-api.config.ts` file.
+CoAP API port is defined in the `src/api/configs/coap-api.config.ts` file.
 
 - `POST /{accessToken}`
 
