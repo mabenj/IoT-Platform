@@ -10,23 +10,15 @@ export default function Home() {
 					label="View Devices"
 					linkTo="/viewDevices"
 					mdiIcon="mdi mdi-lan"
+					title="View all the currently registered devices"
 				/>
 				<NavigationPane
 					label="New Device"
 					linkTo="/registerDevice"
 					mdiIcon="mdi mdi-database-plus"
+					title="Register a new device"
 				/>
 			</div>
-			<span>
-				<span className="mdi mdi-github"></span>
-				<a
-					href="https://github.com/mabenj/IoT-Platform"
-					className="mx-2 text-decoration-none"
-					target="_blank"
-					rel="noreferrer">
-					https://github.com/mabenj/IoT-Platform
-				</a>
-			</span>
 		</>
 	);
 }
@@ -35,14 +27,20 @@ interface NavigationPaneProps {
 	label: string;
 	mdiIcon: string;
 	linkTo: string;
+	title?: string;
 }
 
-const NavigationPane = ({ label, mdiIcon, linkTo }: NavigationPaneProps) => {
+const NavigationPane = ({
+	label,
+	mdiIcon,
+	linkTo,
+	title
+}: NavigationPaneProps) => {
 	return (
-		<Link to={linkTo}>
+		<Link to={linkTo} title={title}>
 			<span
 				className={`
-                    bg-primary bg-gradient m-3 text-light d-flex flex-column 
+                    bg-primary bg-gradient me-4 mt-5 text-light d-flex flex-column 
                     justify-content-center align-items-center hover-filter`}
 				style={{ width: "220px", height: "220px" }}>
 				<span className={mdiIcon} style={{ fontSize: "100px" }}></span>

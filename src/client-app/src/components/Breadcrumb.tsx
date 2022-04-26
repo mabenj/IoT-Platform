@@ -17,14 +17,13 @@ export default function Breadcrumb() {
 				const isActive =
 					breadcrumbData.location.pathname === breadcrumbData.match.pathname;
 				return (
-					<BootstrapBreadcrumb.Item
-						key={index}
-						active={isActive}
-						href={breadcrumbData.key}>
+					<BootstrapBreadcrumb.Item linkAs="span" key={index} active={isActive}>
 						{isActive ? (
 							breadcrumbData.breadcrumb
 						) : (
-							<Link to={breadcrumbData.key}>{breadcrumbData.breadcrumb}</Link>
+							<Link to={breadcrumbData.key} className="hover-underline">
+								{breadcrumbData.breadcrumb}
+							</Link>
 						)}
 					</BootstrapBreadcrumb.Item>
 				);

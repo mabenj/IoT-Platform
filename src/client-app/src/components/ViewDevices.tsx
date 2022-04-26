@@ -47,8 +47,7 @@ const DeviceItem = ({ device }: DeviceCardProps) => {
 				<span className="d-flex justify-content-between p-2">
 					<span>
 						<span className="hover-underline">{device.name}</span>
-						<small className="text-decoration-none text-muted pe-none">
-							<span className="mx-2">|</span>
+						<small className="text-decoration-none text-muted pe-none mx-3">
 							<em>Modified {timeSince(device.updatedAt || new Date())} ago</em>
 						</small>
 					</span>
