@@ -1,5 +1,5 @@
 :root {
-	--sidenav-width: 400px;
+	--sidenav-width: 350px;
 }
 
 body {
@@ -42,7 +42,7 @@ a {
 }
 
 .hover-filter:hover {
-	filter: grayscale(10%);
+	filter: brightness(110%);
 }
 
 .overflow-y-scroll {

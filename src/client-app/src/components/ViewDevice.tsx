@@ -24,5 +24,11 @@ export default function ViewDevice() {
 		}
 	}, [deviceId, state]);
 
-	return <div>Device page for {device?.name}!!</div>;
+	return (
+		<div>
+			<h3>Device page for {device?.name}!!</h3>
+			<br />
+			TODO: delete, modify, view device data, export device data (csv/json?)
+		</div>
+	);
 }

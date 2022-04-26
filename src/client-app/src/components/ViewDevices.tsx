@@ -6,7 +6,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
-import { range, timeSince } from "../utils/utils";
+import { range, sortAlphabetically, timeSince } from "../utils/utils";
 
 export default function ViewDevices() {
 	const [currentDevices, setCurrentDevices] = useState<Device[]>([]);
@@ -28,7 +28,7 @@ export default function ViewDevices() {
 			<ListGroup>
 				{isLoading &&
 					range(0, 10).map((index) => <DevicePlaceholder key={index} />)}
-				{currentDevices.map((device) => (
+				{sortAlphabetically(currentDevices, "name").map((device) => (
 					<DeviceItem key={device.id} device={device} />
 				))}
 			</ListGroup>

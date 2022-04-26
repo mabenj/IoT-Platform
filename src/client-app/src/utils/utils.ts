@@ -30,3 +30,11 @@ export function range(start: number, stop: number, step: number = 1): number[] {
 		(_, i) => start + i * step
 	);
 }
+
+export function sortAlphabetically<T>(array: T[], field: string) {
+	return array.sort((a: any, b: any) => {
+		const fieldA = a[field].toLowerCase();
+		const fieldB = b[field].toLowerCase();
+		return fieldA < fieldB ? -1 : fieldA > fieldB ? 1 : 0;
+	});
+}
