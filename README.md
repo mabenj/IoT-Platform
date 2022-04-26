@@ -1,4 +1,4 @@
-# IoT-Platform
+# IoT Platform
 
 A simple and lightweight IoT platform made as part of _Communication Technologies and Security in IoT_ course.
 
