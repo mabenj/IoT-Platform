@@ -3,9 +3,9 @@ import HttpApiConfig from "./configs/http-api.config";
 import WebApiConfig from "./configs/web-api.config";
 import Log from "./utils/loggers";
 import connect from "./db/connect";
-import CoapApiServer from "./servers/coap-api/server";
-import HttpApiServer from "./servers/http-api/server";
-import WebApiServer from "./servers/web-api/server";
+import CoapApiServer from "./servers/coap-api/CoapApiServer";
+import HttpApiServer from "./servers/http-api/HttpApiServer";
+import WebApiServer from "./servers/web-api/WebApiServer";
 
 const Logger = Log.app;
 

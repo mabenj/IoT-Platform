@@ -47,7 +47,7 @@ async function getDeviceId(accessToken: string): Promise<string> {
 		"id"
 	).exec();
 	if (!device) {
-		return Promise.reject(new Error("Not found"));
+		return Promise.resolve("");
 	}
 	return Promise.resolve(device.id);
 }
