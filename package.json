@@ -9,9 +9,11 @@
 	"scripts": {
 		"build": "npx tsc && cd src/client-app/ && npm install && npm run build",
 		"start": "cross-env NODE_ENV=production node dist/api/app.js",
-		"dev": "nodemon src/api/app.ts"
+		"dev": "nodemon --ignore src/api/demo src/api/app.ts",
+		"demo-device": "ts-node src/api/demo/sendDeviceData.ts"
 	},
 	"dependencies": {
+		"axios": "^0.27.2",
 		"coap": "^1.0.8",
 		"cross-env": "^7.0.3",
 		"dotenv": "^16.0.0",

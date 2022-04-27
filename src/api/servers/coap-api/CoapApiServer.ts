@@ -66,7 +66,7 @@ class CoapApiServer {
 			res.end("No payload specified");
 			return;
 		}
-		const deviceId = await DeviceService.getDeviceId(accessToken);
+		const deviceId = await DeviceService.getDeviceId(accessToken, "coap", true);
 		if (!deviceId) {
 			res.code = "400";
 			res.end(`Could not resolve access token '${accessToken}'`);

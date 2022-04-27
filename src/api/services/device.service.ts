@@ -41,9 +41,13 @@ async function removeDevice(deviceId: string) {
 	await Device.findByIdAndRemove(deviceId).exec();
 }
 
-async function getDeviceId(accessToken: string): Promise<string> {
+async function getDeviceId(
+	accessToken: string,
+	protocol: string,
+	enabled: boolean
+): Promise<string> {
 	const device = await Device.findOne(
-		{ accessToken: accessToken },
+		{ accessToken: accessToken, protocol: protocol, enabled: enabled },
 		"id"
 	).exec();
 	if (!device) {
