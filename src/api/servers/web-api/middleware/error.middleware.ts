@@ -12,6 +12,7 @@ function errorMiddleware(
 		response.status(500);
 	}
 	response.send({ message: error.message || "Something went wrong" });
+	next();
 }
 
 export default errorMiddleware;
