@@ -2,10 +2,16 @@ import { Request, Response } from "express";
 import DeviceDataService from "../../../services/device-data.service";
 
 async function getDeviceData(
-    req: Request<{ deviceId: string }>,
+    req: Request<{ deviceId: string }, {}, {}, { start?: number; stop?: number }>,
     res: Response
 ) {
-    res.json(await DeviceDataService.getDeviceData(req.params.deviceId));
+    res.json(
+        await DeviceDataService.getMostRecentDeviceData(
+            req.params.deviceId,
+            req.query.start,
+            req.query.stop
+        )
+    );
 }
 
 async function deleteDeviceData(

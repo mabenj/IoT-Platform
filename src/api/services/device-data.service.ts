@@ -1,9 +1,25 @@
 import { DeviceData as IDeviceData } from "../../interfaces/device-data.interface";
 import DeviceData from "../models/device-data.model";
 
-async function getDeviceData(deviceId: string): Promise<IDeviceData[]> {
-    const deviceData = await DeviceData.find({ deviceId: deviceId }).exec();
+async function getAllDeviceData(deviceId: string): Promise<IDeviceData[]> {
+    const deviceData = await DeviceData.find({ deviceId }).exec();
     return Promise.resolve(deviceData ? deviceData : []);
+}
+
+async function getMostRecentDeviceData(
+    deviceId: string,
+    start?: number,
+    stop?: number
+): Promise<IDeviceData[]> {
+    if (start && stop) {
+        const deviceData = await DeviceData.find({ deviceId })
+            .sort({ createdAt: "asc" })
+            .limit(stop)
+            .skip(start)
+            .exec();
+        return Promise.resolve(deviceData ? deviceData : []);
+    }
+    return getAllDeviceData(deviceId);
 }
 
 async function addDeviceData(
@@ -22,7 +38,8 @@ async function removeDeviceData(deviceId: string) {
 }
 
 export default {
-    getDeviceData,
+    getAllDeviceData,
+    getMostRecentDeviceData,
     addDeviceData,
     removeDeviceData
 };
