@@ -1,6 +1,8 @@
 import coap = require("coap");
+import Config from "../../configs/coap-api.config";
 import DeviceDataService from "../../services/device-data.service";
 import DeviceService from "../../services/device.service";
+import { sleep } from "../../utils/utils";
 import Logger from "./logger";
 
 class CoapApiServer {
@@ -20,7 +22,11 @@ class CoapApiServer {
 		);
 	}
 
-	private handleRequest(req: coap.IncomingMessage, res: coap.OutgoingMessage) {
+	private async handleRequest(
+		req: coap.IncomingMessage,
+		res: coap.OutgoingMessage
+	) {
+		!this.isProd && (await sleep(Config.incomingRequestDelayMs));
 		try {
 			Logger.info(`${req.method} ${req.url}`);
 			switch (req.method) {
