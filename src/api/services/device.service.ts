@@ -1,7 +1,7 @@
 import { Device as IDevice } from "../../interfaces/device.interface";
 import Device from "../models/device.model";
 
-// const ACCESS_TOKEN_PATTERN = new RegExp("^([a-zA-Z0-9]{9,})$")
+const ACCESS_TOKEN_PATTERN = new RegExp("^([a-zA-Z0-9]{9,})$");
 
 async function getAllDevices(): Promise<IDevice[]> {
 	const result = await Device.find().exec();
@@ -17,10 +17,9 @@ async function getDevice(deviceId: string): Promise<IDevice> {
 }
 
 async function addDevice(device: IDevice): Promise<IDevice> {
-	// if (!ACCESS_TOKEN_PATTERN.test(device.accessToken)) {
-	//     console.log("invalid")
-	// 	return Promise.reject(new Error("Invalid access token"));
-	// }
+	if (!ACCESS_TOKEN_PATTERN.test(device.accessToken)) {
+		return Promise.reject(new Error("Invalid access token"));
+	}
 	const newDevice = await new Device(device).save();
 	return Promise.resolve(newDevice);
 }
