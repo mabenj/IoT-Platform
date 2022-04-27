@@ -11,7 +11,6 @@ export default function ViewData() {
   const { deviceId } = useParams();
   const { state } = useLocation();
   const [device, setDevice] = useState<Device>();
-  console.log(JSON.stringify(device, null, 2));
 
   useEffect(() => {
     async function fetchDevice() {
