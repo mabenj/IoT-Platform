@@ -15,15 +15,17 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 ## Installation
 
 1. `git clone`
-2. `npm install`
-3. `npm run build`
-4. Configure MongoDB connection (see [Database Connection](#database-connection))
-5. `npm start`
+2. `cd IoT-Platform`
+3. `npm install`
+4. `npm run build`
+5. Configure MongoDB connection (see [Database Connection](#database-connection))
+6. `npm start`
 
 ## Development
 
 1. `git clone`
-2. **Back-end**
+2. `cd IoT-Platform`
+3. **Back-end**
 
    2.1 `npm install`
 
