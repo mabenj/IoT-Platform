@@ -42,10 +42,21 @@ export default function ViewDeviceData() {
         fetchDeviceAndData();
     }, [resolveDeviceAndData]);
 
+    const exportData = () => {
+        // TODO
+    };
+
     return (
         <div>
             <h2>Device Data - {device?.name}</h2>
             <Col sm={8}>
+                <Button
+                    title="Export all device data as JSON"
+                    className="mt-4"
+                    disabled={deviceData.length < 1}
+                    onClick={() => exportData()}>
+                    <span className="mdi mdi-cloud-download"></span> Export JSON
+                </Button>
                 {!isFetchingData &&
                     deviceData.map((data) => (
                         <DeviceDataCard key={data.id} data={data} />
