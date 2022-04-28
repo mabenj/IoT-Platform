@@ -1,10 +1,14 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Col from "react-bootstrap/Col";
+import Collapse from "react-bootstrap/Collapse";
 import Placeholder from "react-bootstrap/Placeholder";
 import { useParams } from "react-router-dom";
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceDataService from "../services/DeviceDataService";
-import { range } from "../utils/utils";
+import { range, timeSince } from "../utils/utils";
 import { DevicesContext } from "./App";
 
 export default function ViewDeviceData() {
@@ -18,12 +22,12 @@ export default function ViewDeviceData() {
         setIsFetchingData(true);
         const currentDevice = devices.find(({ id }) => id === deviceId);
         if (currentDevice) {
+            setDevice(currentDevice);
             const deviceData = await DeviceDataService.getDeviceData(
                 currentDevice.id!,
                 0,
                 20
             );
-            setDevice(currentDevice);
             setDeviceData(deviceData);
         }
         setIsFetchingData(false);
@@ -38,10 +42,13 @@ export default function ViewDeviceData() {
 
     return (
         <div>
-            <h2>Device Data: {device?.name}</h2>
-            {!isFetchingData && (
-                <pre>{JSON.stringify(deviceData, null, 2)}</pre>
-            )}
+            <h2>Device Data - {device?.name}</h2>
+            <Col sm={8}>
+                {!isFetchingData &&
+                    deviceData.map((data) => (
+                        <DeviceDataCard key={data.id} data={data} />
+                    ))}
+            </Col>
 
             {isFetchingData &&
                 range(0, 10).map((index) => (
@@ -54,83 +61,76 @@ export default function ViewDeviceData() {
     );
 }
 
-const DeviceDataPlaceholder = () => {
-    const maxWidthPx = 350;
-    const minWidthPx = 250;
+interface DeviceDataProps {
+    data: DeviceData;
+}
+
+const DeviceDataCard = ({ data }: DeviceDataProps) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
     return (
-        <Placeholder animation="glow" className="my-5">
-            <div>
-                <Placeholder
-                    size="lg"
-                    style={{
-                        width: `${
-                            Math.random() * (maxWidthPx - minWidthPx + 1) +
-                            minWidthPx
-                        }px`
-                    }}
-                />
-            </div>
-            <div>
-                <Placeholder
-                    size="lg"
-                    style={{
-                        width: `${
-                            Math.random() * (maxWidthPx - minWidthPx + 1) +
-                            minWidthPx
-                        }px`
-                    }}
-                />
-            </div>
-            <div>
-                <Placeholder
-                    size="lg"
-                    style={{
-                        width: `${
-                            Math.random() * (maxWidthPx - minWidthPx + 1) +
-                            minWidthPx
-                        }px`
-                    }}
-                />
-            </div>
-            <div>
-                <Placeholder
-                    size="lg"
-                    style={{
-                        width: `${
-                            Math.random() * (maxWidthPx - minWidthPx + 1) +
-                            minWidthPx
-                        }px`
-                    }}
-                />
-            </div>
-            <div>
-                <Placeholder
-                    size="lg"
-                    style={{
-                        width: `${
-                            Math.random() * (maxWidthPx - minWidthPx + 1) +
-                            minWidthPx
-                        }px`
-                    }}
-                />
-            </div>
-            {/* <span className="d-flex justify-content-between p-2">
+        <Card className="my-4 shadow-sm">
+            <Card.Body>
+                <span className="d-flex justify-content-between">
+                    <Card.Title>{data.createdAt.toLocaleString()}</Card.Title>
+                    <Button
+                        variant=""
+                        as="span"
+                        className={
+                            isExpanded
+                                ? "mdi mdi-chevron-up fs-4"
+                                : "mdi mdi-chevron-down fs-4"
+                        }
+                        size="sm"
+                        onClick={() => setIsExpanded((prev) => !prev)}></Button>
+                </span>
+                <Card.Subtitle className="text-muted">
+                    <small>{data.id}</small>
+                </Card.Subtitle>
+                <Collapse in={isExpanded} className="mt-4">
+                    <Card.Text>
+                        <pre>{JSON.stringify(data.data, null, 2)}</pre>
+                    </Card.Text>
+                </Collapse>
+            </Card.Body>
+            <Card.Footer className="text-muted">
+                {timeSince(data.createdAt)} ago
+            </Card.Footer>
+        </Card>
+    );
+};
+
+const DeviceDataPlaceholder = () => {
+    return (
+        <Placeholder animation="glow">
+            <Card className="my-4 shadow-sm">
+                <Card.Body>
+                    <Card.Title>
+                        <Placeholder
+                            size="lg"
+                            style={{
+                                width: `210px`
+                            }}
+                        />
+                    </Card.Title>
+                    <Card.Subtitle className="text-muted">
+                        <Placeholder
+                            size="lg"
+                            style={{
+                                width: `200px`
+                            }}
+                        />
+                    </Card.Subtitle>
+                </Card.Body>
+                <Card.Footer className="text-muted">
                     <Placeholder
                         size="lg"
                         style={{
-                            width: `${
-                                Math.random() * (maxWidthPx - minWidthPx + 1) +
-                                minWidthPx
-                            }px`
+                            width: `100px`
                         }}
                     />
-                    <Placeholder
-                        size="lg"
-                        style={{
-                            width: "70px"
-                        }}
-                    />
-                </span> */}
+                </Card.Footer>
+            </Card>
         </Placeholder>
     );
 };

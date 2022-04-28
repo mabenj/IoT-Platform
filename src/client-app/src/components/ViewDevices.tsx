@@ -30,7 +30,7 @@ export default function ViewDevices() {
                 <h2 className="d-inline">Registered Devices</h2>
                 {isLoading && <Spinner animation="border" className="mx-3" />}
             </div>
-            <ListGroup>
+            <ListGroup className="shadow-sm">
                 {isLoading &&
                     range(1, devices.length || 10).map((index) => (
                         <DevicePlaceholder key={index} />
