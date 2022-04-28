@@ -14,14 +14,17 @@ import DeviceDataService from "../services/DeviceDataService";
 import { range, timeSince } from "../utils/utils";
 import { DevicesContext } from "./App";
 
-const CHUNK_SIZE = 20;
+const CHUNK_SIZE = 100;
 
 export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
     const [deviceData, setDeviceData] = useState<Map<string, DeviceData>>(
         new Map()
     );
-    const [chunkIndexes, setChunkIndexes] = useState<[number, number]>([0, 20]);
+    const [chunkIndexes, setChunkIndexes] = useState<[number, number]>([
+        0,
+        CHUNK_SIZE
+    ]);
     const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
