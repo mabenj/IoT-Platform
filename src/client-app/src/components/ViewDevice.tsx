@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Badge } from "react-bootstrap";
+import Badge from "react-bootstrap/Badge";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
+import DeviceForm from "./DeviceForm";
 
 interface LocationState {
     device: Device;
@@ -35,9 +36,11 @@ export default function ViewDevice() {
                 </Link>
             </h1>
             <br />
-            <pre>{JSON.stringify(device, null, 2)}</pre>
-            TODO: delete, modify, view device data, export device data
-            (csv/json?)
+            <DeviceForm
+                initialDevice={device}
+                onSubmit={async (device) => console.log(device)}
+            />
+            TODO: view device data, export device data(csv/json?)
         </div>
     );
 }
