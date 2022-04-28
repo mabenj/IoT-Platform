@@ -68,6 +68,7 @@ export default function DeviceForm({
         setIsRegistering(false);
 
         setIsEditing(false);
+        setValidated(false);
     };
 
     const handleCancel = () => {
