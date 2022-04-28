@@ -79,23 +79,54 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                 to={`/viewDevices/${device.id}`}
                 state={{ device }}
                 title={device.description}>
-                <span className="d-flex justify-content-between p-2">
-                    <span>
-                        <span className="hover-underline">{device.name}</span>
-                        <small className="text-decoration-none text-muted pe-none mx-3">
-                            <em>
-                                Modified{" "}
-                                {timeSince(device.updatedAt || new Date())} ago
-                            </em>
-                        </small>
+                <span className="d-flex justify-content-between">
+                    <span className="flex-grow-1">
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "5%", minWidth: "80px" }}>
+                            <Badge
+                                pill
+                                bg={device.enabled ? "success" : "secondary"}
+                                className="me-3">
+                                {device.enabled ? "Enabled" : "Disabled"}
+                            </Badge>
+                        </span>
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "5%", minWidth: "80px" }}>
+                            <Badge
+                                bg={
+                                    device.protocol === "http"
+                                        ? "primary"
+                                        : "info"
+                                }
+                                pill>
+                                {device.protocol === "http"
+                                    ? "HTTP"
+                                    : device.protocol === "coap"
+                                    ? "CoAP"
+                                    : "Unknown"}
+                            </Badge>
+                        </span>
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "20%", minWidth: "80px" }}>
+                            <span className="hover-underline">
+                                {device.name}
+                            </span>
+                        </span>
+                        <span className="d-inline-block">
+                            <small className="text-decoration-none text-muted pe-none">
+                                <em>
+                                    Modified{" "}
+                                    {timeSince(device.updatedAt || new Date())}{" "}
+                                    ago
+                                </em>
+                            </small>
+                        </span>
                     </span>
-                    <span>
-                        <Badge
-                            pill
-                            bg={device.enabled ? "success" : "secondary"}
-                            className="me-3">
-                            {device.enabled ? "Enabled" : "Disabled"}
-                        </Badge>
+
+                    <span className="d-inline-block">
                         <Badge
                             className="hover-filter"
                             bg="danger"
@@ -111,27 +142,63 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
 };
 
 const DevicePlaceholder = () => {
-    const maxWidthPx = 350;
-    const minWidthPx = 250;
     return (
         <ListGroup.Item>
             <Placeholder animation="glow">
-                <span className="d-flex justify-content-between p-2">
-                    <Placeholder
-                        size="lg"
-                        style={{
-                            width: `${
-                                Math.random() * (maxWidthPx - minWidthPx + 1) +
-                                minWidthPx
-                            }px`
-                        }}
-                    />
-                    <Placeholder
-                        size="lg"
-                        style={{
-                            width: "70px"
-                        }}
-                    />
+                <span className="d-flex justify-content-between">
+                    <span className="flex-grow-1">
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "5%", minWidth: "80px" }}>
+                            <Placeholder
+                                size="lg"
+                                style={{
+                                    width: "50px"
+                                }}
+                            />
+                        </span>
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "5%", minWidth: "80px" }}>
+                            <Placeholder
+                                size="lg"
+                                style={{
+                                    width: "50px"
+                                }}
+                            />
+                        </span>
+                        <span
+                            className="d-inline-block"
+                            style={{ width: "20%", minWidth: "80px" }}>
+                            <Placeholder
+                                size="lg"
+                                style={{
+                                    width: `${
+                                        Math.random() * (190 - 270 + 1) + 190
+                                    }px`
+                                }}
+                            />
+                        </span>
+                        <span className="d-inline-block">
+                            <Placeholder
+                                size="lg"
+                                style={{
+                                    width: `${
+                                        Math.random() * (150 - 180 + 1) + 150
+                                    }px`
+                                }}
+                            />
+                        </span>
+                    </span>
+
+                    <span className="d-inline-block">
+                        <Placeholder
+                            size="lg"
+                            style={{
+                                width: "70px"
+                            }}
+                        />
+                    </span>
                 </span>
             </Placeholder>
         </ListGroup.Item>
