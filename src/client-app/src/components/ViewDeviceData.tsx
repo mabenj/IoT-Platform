@@ -5,6 +5,7 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Collapse from "react-bootstrap/Collapse";
 import Placeholder from "react-bootstrap/Placeholder";
+import Spinner from "react-bootstrap/Spinner";
 import ReactJson from "react-json-view";
 import { useParams } from "react-router-dom";
 import { DeviceData } from "../../../interfaces/device-data.interface";
@@ -17,6 +18,7 @@ export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
     const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
     const [isFetchingData, setIsFetchingData] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
 
@@ -42,8 +44,10 @@ export default function ViewDeviceData() {
         fetchDeviceAndData();
     }, [resolveDeviceAndData]);
 
-    const exportData = () => {
-        // TODO
+    const exportData = async () => {
+        setIsExporting(true);
+        await DeviceDataService.exportAllDeviceData(device?.id!);
+        setIsExporting(false);
     };
 
     return (
@@ -53,9 +57,18 @@ export default function ViewDeviceData() {
                 <Button
                     title="Export all device data as JSON"
                     className="mt-4"
-                    disabled={deviceData.length < 1}
+                    disabled={deviceData.length < 1 || isExporting}
                     onClick={() => exportData()}>
-                    <span className="mdi mdi-cloud-download"></span> Export JSON
+                    {isExporting ? (
+                        <Spinner
+                            animation="border"
+                            size="sm"
+                            className="me-2"
+                        />
+                    ) : (
+                        <span className="mdi mdi-cloud-download"></span>
+                    )}{" "}
+                    Export JSON
                 </Button>
                 {!isFetchingData &&
                     deviceData.map((data) => (

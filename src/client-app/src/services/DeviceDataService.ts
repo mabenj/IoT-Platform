@@ -11,11 +11,34 @@ async function getDeviceData(deviceId: string, start?: number, stop?: number) {
     }));
 }
 
+async function exportAllDeviceData(deviceId: string) {
+    const response = await axios.get(`/api/deviceData/${deviceId}/exportJson`, {
+        responseType: "blob"
+    });
+    const filename = response.headers["content-disposition"]
+        .split("filename=")[1]
+        .split(".")[0];
+    const extension = response.headers["content-disposition"]
+        .split(".")[1]
+        .split(";")[0];
+    const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.setAttribute("download", `${filename}.${extension}`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
 async function deleteAllDeviceData(deviceId: string) {
     //TODO
     throw new Error("Not implemented");
 }
 
-const DeviceDataService = { getDeviceData, deleteAllDeviceData };
+const DeviceDataService = {
+    getDeviceData,
+    deleteAllDeviceData,
+    exportAllDeviceData
+};
 
 export default DeviceDataService;
