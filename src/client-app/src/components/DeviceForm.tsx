@@ -28,7 +28,7 @@ interface DeviceFormProps {
 export default function DeviceForm({
     initialDevice,
     isCreatingNew,
-    onSubmit,
+    onSubmit
 }: DeviceFormProps) {
     const [isEditing, setIsEditing] = useState(!!isCreatingNew);
     const [isAccessTokenVisible, setIsAccessTokenVisible] = useState(false);
@@ -111,8 +111,7 @@ export default function DeviceForm({
             noValidate
             validated={validated}
             onSubmit={handleSubmit}
-            onReset={() => setValidated(false)}
-        >
+            onReset={() => setValidated(false)}>
             <Form.Group className="mb-4" controlId="deviceName">
                 <Row>
                     <LabelCol>
@@ -122,7 +121,7 @@ export default function DeviceForm({
                             </span>
                         </Form.Label>
                     </LabelCol>
-                    <Col hidden={!isEditing}>
+                    <ValueCol hidden={!isEditing}>
                         <Form.Control
                             type="text"
                             placeholder="Enter a name"
@@ -132,10 +131,10 @@ export default function DeviceForm({
                         <Form.Control.Feedback type="invalid">
                             Provide a name
                         </Form.Control.Feedback>
-                    </Col>
-                    <Col hidden={isEditing}>
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
                         <ValueField>{initialDevice?.name}</ValueField>
-                    </Col>
+                    </ValueCol>
                 </Row>
             </Form.Group>
             <Form.Group className="mb-4" controlId="deviceDescription">
@@ -143,18 +142,18 @@ export default function DeviceForm({
                     <LabelCol>
                         <Form.Label>Description</Form.Label>
                     </LabelCol>
-                    <Col hidden={!isEditing}>
+                    <ValueCol hidden={!isEditing}>
                         <Form.Control
                             as="textarea"
                             placeholder="Enter a description"
                             disabled={isRegistering}
                         />
-                    </Col>
-                    <Col hidden={isEditing}>
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
                         <ValueField>
                             {initialDevice?.description || "-"}
                         </ValueField>
-                    </Col>
+                    </ValueCol>
                 </Row>
             </Form.Group>
             <Form.Group className="mb-4" controlId="deviceDescription">
@@ -162,7 +161,7 @@ export default function DeviceForm({
                     <LabelCol>
                         <Form.Label>Enabled</Form.Label>
                     </LabelCol>
-                    <Col hidden={!isEditing}>
+                    <ValueCol hidden={!isEditing}>
                         <Form.Check
                             type="switch"
                             id="deviceEnabled"
@@ -170,12 +169,12 @@ export default function DeviceForm({
                             defaultChecked
                             disabled={isRegistering}
                         />
-                    </Col>
-                    <Col hidden={isEditing}>
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
                         <ValueField>
                             {initialDevice?.enabled ? "Yes" : "No"}
                         </ValueField>
-                    </Col>
+                    </ValueCol>
                 </Row>
             </Form.Group>
             <Form.Group className="mb-4">
@@ -183,7 +182,7 @@ export default function DeviceForm({
                     <LabelCol>
                         <Form.Label>Protocol</Form.Label>
                     </LabelCol>
-                    <Col hidden={!isEditing}>
+                    <ValueCol hidden={!isEditing}>
                         <div>
                             <Form.Check
                                 inline
@@ -211,14 +210,14 @@ export default function DeviceForm({
                             The protocol used by the device to send data to
                             IoT-Platform
                         </Form.Text>
-                    </Col>
-                    <Col hidden={isEditing}>
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
                         <ValueField>
                             {initialDevice?.protocol === "http"
                                 ? "HTTP"
                                 : "CoAP"}
                         </ValueField>
-                    </Col>
+                    </ValueCol>
                 </Row>
             </Form.Group>
             <Form.Group className="mb-4" controlId="deviceAccessToken">
@@ -228,7 +227,7 @@ export default function DeviceForm({
                             Access Token <Asterisk isEditing={isEditing} />
                         </Form.Label>
                     </LabelCol>
-                    <Col hidden={!isEditing}>
+                    <ValueCol hidden={!isEditing}>
                         <InputGroup>
                             <Form.Control
                                 type="text"
@@ -241,16 +240,14 @@ export default function DeviceForm({
                                 variant="outline-secondary"
                                 onClick={() => generateAccessToken()}
                                 title="Generate access token"
-                                disabled={isRegistering}
-                            >
+                                disabled={isRegistering}>
                                 <span className="mdi mdi-refresh"></span>
                             </Button>
                             <Button
                                 variant="outline-secondary"
                                 onClick={() => copyAccessToken()}
                                 title="Copy to clipboard"
-                                disabled={isRegistering}
-                            >
+                                disabled={isRegistering}>
                                 <span className="mdi mdi-content-copy"></span>
                             </Button>
                             <Form.Control.Feedback type="invalid">
@@ -263,8 +260,8 @@ export default function DeviceForm({
                             Access token is used to link the real physical
                             device to IoT-Platform
                         </Form.Text>
-                    </Col>
-                    <Col hidden={isEditing}>
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
                         <ValueField>
                             <span className="d-flex justify-content-between">
                                 {getAccessTokenString(
@@ -282,8 +279,7 @@ export default function DeviceForm({
                                             isAccessTokenVisible
                                                 ? "Hide access token"
                                                 : "Show access token"
-                                        }
-                                    >
+                                        }>
                                         {isAccessTokenVisible ? (
                                             <span className="mdi mdi-eye-off"></span>
                                         ) : (
@@ -294,26 +290,24 @@ export default function DeviceForm({
                                         variant="outline-secondary"
                                         onClick={() => copyAccessToken()}
                                         title="Copy to clipboard"
-                                        disabled={isRegistering}
-                                    >
+                                        disabled={isRegistering}>
                                         <span className="mdi mdi-content-copy"></span>
                                     </Button>
                                 </ButtonGroup>
                             </span>
                         </ValueField>
-                    </Col>
+                    </ValueCol>
                 </Row>
             </Form.Group>
             <Row>
                 <LabelCol></LabelCol>
-                <Col>
+                <ValueCol>
                     {isEditing ? (
                         <>
                             <Button
                                 variant="primary"
                                 type="submit"
-                                disabled={isRegistering}
-                            >
+                                disabled={isRegistering}>
                                 {isRegistering ? (
                                     <Spinner animation="border" size="sm" />
                                 ) : (
@@ -327,8 +321,7 @@ export default function DeviceForm({
                                 variant="secondary"
                                 type="reset"
                                 onClick={() => handleCancel()}
-                                className="mx-3"
-                            >
+                                className="mx-3">
                                 <span className="mdi mdi-close"></span> Cancel
                             </Button>
                         </>
@@ -337,7 +330,7 @@ export default function DeviceForm({
                             Modify Device
                         </Button>
                     )}
-                </Col>
+                </ValueCol>
             </Row>
         </Form>
     );
@@ -353,9 +346,21 @@ const LabelCol = ({ children }: LabelColProps) => {
             xxl={LABEL_COL_WIDTH_XXl}
             xl={LABEL_COL_WIDTH_XL}
             lg={LABEL_COL_WIDTH_LG}
-            className="text-lg-end"
-        >
+            className="text-lg-end">
             <strong className="me-4">{children}</strong>
+        </Col>
+    );
+};
+
+interface ValueColProps {
+    children?: React.ReactNode;
+    hidden?: boolean;
+}
+
+const ValueCol = ({ children, hidden }: ValueColProps) => {
+    return (
+        <Col lg={6} hidden={hidden}>
+            {children}
         </Col>
     );
 };
@@ -380,8 +385,7 @@ const Asterisk = ({ isEditing }: AsteriskProps) => {
         <sup
             className="mdi mdi-asterisk text-primary"
             title="This is a required field"
-            style={{ fontSize: "0.5rem" }}
-        ></sup>
+            style={{ fontSize: "0.5rem" }}></sup>
     );
 };
 
@@ -397,7 +401,7 @@ function populateDeviceForm(
         deviceName,
         deviceDescription,
         deviceProtocol,
-        deviceAccessToken,
+        deviceAccessToken
     } = form.elements as any;
     deviceEnabled.checked = initialDevice.enabled;
     deviceName.value = initialDevice.name;
@@ -412,14 +416,14 @@ function extractDevice(form: HTMLFormElement) {
         deviceName,
         deviceDescription,
         deviceProtocol,
-        deviceAccessToken,
+        deviceAccessToken
     } = form.elements as any;
     const device: Device = {
         name: deviceName.value,
         accessToken: deviceAccessToken.value,
         description: deviceDescription.value,
         enabled: deviceEnabled.checked,
-        protocol: deviceProtocol.value,
+        protocol: deviceProtocol.value
     };
     return device;
 }
