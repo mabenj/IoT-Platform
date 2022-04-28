@@ -1,14 +1,21 @@
 import axios from "axios";
-import { DeviceData } from "../../../interfaces/device-data.interface";
+import { GetDeviceDataResponse } from "../../../interfaces/get-device-data-response.interface";
 
-async function getDeviceData(deviceId: string, start?: number, stop?: number) {
-    const response = await axios.get<DeviceData[]>(
+async function getDeviceData(
+    deviceId: string,
+    start?: number,
+    stop?: number
+): Promise<GetDeviceDataResponse> {
+    const response = await axios.get<GetDeviceDataResponse>(
         `/api/deviceData/${deviceId}?start=${start}&stop=${stop}`
     );
-    return response.data.map((deviceDatum) => ({
-        ...deviceDatum,
-        createdAt: new Date(deviceDatum.createdAt)
-    }));
+    return {
+        ...response.data,
+        deviceData: response.data.deviceData.map((deviceDatum) => ({
+            ...deviceDatum,
+            createdAt: new Date(deviceDatum.createdAt)
+        }))
+    };
 }
 
 async function exportAllDeviceData(deviceId: string) {

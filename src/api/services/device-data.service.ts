@@ -1,23 +1,28 @@
-import { DeviceData as IDeviceData } from "../../interfaces/device-data.interface";
+import { DeviceData as DeviceDataInterface } from "../../interfaces/device-data.interface";
+import { GetDeviceDataResponse } from "../../interfaces/get-device-data-response.interface";
 import DeviceData from "../models/device-data.model";
 
-async function getAllDeviceData(deviceId: string): Promise<IDeviceData[]> {
-    const deviceData = await DeviceData.find({ deviceId }).exec();
-    return Promise.resolve(deviceData ? deviceData : []);
+async function getAllDeviceData(
+    deviceId: string
+): Promise<GetDeviceDataResponse> {
+    const deviceData = (await DeviceData.find({ deviceId }).exec()) || [];
+    return Promise.resolve({ deviceData, count: deviceData.length });
 }
 
 async function getMostRecentDeviceData(
     deviceId: string,
     start?: number,
     stop?: number
-): Promise<IDeviceData[]> {
+): Promise<GetDeviceDataResponse> {
     if (start && stop) {
-        const deviceData = await DeviceData.find({ deviceId })
-            .sort({ createdAt: "asc" })
-            .limit(stop)
-            .skip(start)
-            .exec();
-        return Promise.resolve(deviceData ? deviceData : []);
+        const deviceData =
+            (await DeviceData.find({ deviceId })
+                .sort({ createdAt: "asc" })
+                .limit(stop)
+                .skip(start)
+                .exec()) || [];
+        const count = await DeviceData.countDocuments({ deviceId });
+        return Promise.resolve({ deviceData, count });
     }
     return getAllDeviceData(deviceId);
 }
@@ -25,7 +30,7 @@ async function getMostRecentDeviceData(
 async function addDeviceData(
     deviceId: string,
     data: any
-): Promise<IDeviceData> {
+): Promise<DeviceDataInterface> {
     const newDeviceDatum = await new DeviceData({
         deviceId: deviceId,
         data: data

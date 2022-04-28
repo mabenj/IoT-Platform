@@ -14,28 +14,57 @@ import DeviceDataService from "../services/DeviceDataService";
 import { range, timeSince } from "../utils/utils";
 import { DevicesContext } from "./App";
 
+const CHUNK_SIZE = 20;
+
 export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
-    const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
+    const [deviceData, setDeviceData] = useState<Map<string, DeviceData>>(
+        new Map()
+    );
+    const [chunkIndexes, setChunkIndexes] = useState<[number, number]>([0, 20]);
+    const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
 
+    const fetchDeviceDataChunk = useCallback(
+        async (deviceId: string) => {
+            if (
+                deviceData.size === totalDeviceDataCount &&
+                totalDeviceDataCount > 0
+            ) {
+                return;
+            }
+            setIsFetchingData(true);
+            const { deviceData: newDeviceData, count } =
+                await DeviceDataService.getDeviceData(
+                    deviceId,
+                    chunkIndexes[0],
+                    chunkIndexes[1]
+                );
+            setDeviceData((prev) => {
+                newDeviceData.forEach((data) => prev.set(data.id, data));
+                return prev;
+            });
+            setChunkIndexes((prev) => [
+                Math.min(prev[0] + CHUNK_SIZE + 1, count),
+                Math.min(prev[1] + CHUNK_SIZE + 1, count)
+            ]);
+            setTotalDeviceDataCount(count);
+            setIsFetchingData(false);
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
+
     const resolveDeviceAndData = useCallback(async () => {
-        setIsFetchingData(true);
         const currentDevice = devices.find(({ id }) => id === deviceId);
         if (currentDevice) {
             setDevice(currentDevice);
-            const deviceData = await DeviceDataService.getDeviceData(
-                currentDevice.id!,
-                0,
-                20
-            );
-            setDeviceData(deviceData);
+            fetchDeviceDataChunk(currentDevice.id!);
         }
-        setIsFetchingData(false);
-    }, [deviceId, devices]);
+    }, [deviceId, devices, fetchDeviceDataChunk]);
 
     useEffect(() => {
         async function fetchDeviceAndData() {
@@ -57,7 +86,7 @@ export default function ViewDeviceData() {
                 <Button
                     title="Export all device data as JSON"
                     className="mt-4"
-                    disabled={deviceData.length < 1 || isExporting}
+                    disabled={deviceData.size < 1 || isExporting}
                     onClick={() => exportData()}>
                     {isExporting ? (
                         <Spinner
@@ -70,30 +99,33 @@ export default function ViewDeviceData() {
                     )}{" "}
                     Export JSON
                 </Button>
+                <small className="text-muted d-block mt-4">
+                    Showing {deviceData.size} out of {totalDeviceDataCount}{" "}
+                    entries
+                </small>
                 {!isFetchingData &&
-                    deviceData.map((data) => (
+                    Array.from(deviceData.values()).map((data) => (
                         <DeviceDataCard key={data.id} data={data} />
                     ))}
-                {!isFetchingData && deviceData.length === 0 && (
+                {isFetchingData &&
+                    range(0, 10).map((index) => (
+                        <>
+                            <DeviceDataPlaceholder key={index} />
+                            <br />
+                        </>
+                    ))}
+                {!isFetchingData && deviceData.size === 0 && (
                     <Alert variant="warning" className="mt-5">
                         No device data exists for device '
                         <strong>{device?.name}</strong>'
                     </Alert>
                 )}
-                {!isFetchingData && deviceData.length > 20 && (
+                {!isFetchingData && totalDeviceDataCount > 20 && (
                     <Alert variant="warning" className="mt-5">
-                        Only the first 20 entries are shown
+                        Only the first {deviceData.size} entries are shown
                     </Alert>
                 )}
             </Col>
-
-            {isFetchingData &&
-                range(0, 10).map((index) => (
-                    <>
-                        <DeviceDataPlaceholder key={index} />
-                        <br />
-                    </>
-                ))}
         </div>
     );
 }
@@ -139,8 +171,8 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
 
 const DeviceDataPlaceholder = () => {
     return (
-        <Placeholder animation="glow">
-            <Card className="my-4 shadow-sm">
+        <Card className="shadow-sm">
+            <Placeholder animation="glow">
                 <Card.Body>
                     <Card.Title>
                         <Placeholder
@@ -167,7 +199,7 @@ const DeviceDataPlaceholder = () => {
                         }}
                     />
                 </Card.Footer>
-            </Card>
-        </Placeholder>
+            </Placeholder>
+        </Card>
     );
 };

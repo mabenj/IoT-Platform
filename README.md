@@ -150,18 +150,21 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 
 ### /api/deviceData
 
--   `GET /api/deviceData/{id}` Gets all the device data associated with a device that has the corresponding id
+-   `GET /api/deviceData/{id}?start={startIndex}&stop={stopIndex}` Gets all the device data associated with a device that has the corresponding id starting from start index to stop index.
 
 ```
   Response Body:
   [
-    {
-        id: <string>
-        deviceId: <string>,
-        createdAt: Date
-        [key: <string>]: any,
-    },
-    ...
+      {
+        totalCount: <number>,
+        deviceData: {
+            id: <string>,
+            deviceId: <string>,
+            createdAt: Date,
+            [key: <string>]: any
+        }
+      },
+        ...
   ]
 ```
 
