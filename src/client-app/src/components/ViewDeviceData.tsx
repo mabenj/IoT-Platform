@@ -1,9 +1,11 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Collapse from "react-bootstrap/Collapse";
 import Placeholder from "react-bootstrap/Placeholder";
+import ReactJson from "react-json-view";
 import { useParams } from "react-router-dom";
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
@@ -48,6 +50,17 @@ export default function ViewDeviceData() {
                     deviceData.map((data) => (
                         <DeviceDataCard key={data.id} data={data} />
                     ))}
+                {!isFetchingData && deviceData.length === 0 && (
+                    <Alert variant="warning" className="mt-5">
+                        No device data exists for device '
+                        <strong>{device?.name}</strong>'
+                    </Alert>
+                )}
+                {!isFetchingData && deviceData.length > 20 && (
+                    <Alert variant="warning" className="mt-5">
+                        Only the first 20 entries are shown
+                    </Alert>
+                )}
             </Col>
 
             {isFetchingData &&
@@ -89,7 +102,7 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
                 </Card.Subtitle>
                 <Collapse in={isExpanded} className="mt-4">
                     <Card.Text>
-                        <pre>{JSON.stringify(data.data, null, 2)}</pre>
+                        <ReactJson src={data.data} name={null} />
                     </Card.Text>
                 </Collapse>
             </Card.Body>
