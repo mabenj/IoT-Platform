@@ -81,20 +81,20 @@ Connection to MongoDB requires the following entries in a `.env` file located in
 
 ### Registering a device
 
-<img src="https://i.imgur.com/29icufS.png" width="500">
+![Registering devices](https://i.imgur.com/29icufS.png)
 
 New devices can be registered in the **Register a Device** page. When registering a device, you must specify a name, optional description, status (enabled or disabled), communication protocol, and an access token. The access token is used to send data from the end-devices to the IoT platform.
 
 ### Managing devices
 
-<img src="https://i.imgur.com/BzdfHSh.png" width="500">
-<img src="https://i.imgur.com/Rzy1sfM.png" width="500">
+![Registered devices](https://i.imgur.com/BzdfHSh.png)
+![Device configuration](https://i.imgur.com/Rzy1sfM.png)
 
 Registered devices can be viewed in the **View Devices** page. From there you can delete a device by pressing the corresponding red **delete** button. To view or update a device's configuration, you must select a device from the list. This will navigate you to the device's configration page where you can view and update the configuration.
 
 ### Accessing device data
 
-<img src="https://i.imgur.com/S1A03DK.png" width="500">
+![Device data](https://i.imgur.com/S1A03DK.png)
 
 To view the received device data, you must press the **View Device Data** button while not modifying the device in the device's configuration page. In the device data page you can view the most recent received data, export all of the device data (JSON), or delete all of the device data.
 
