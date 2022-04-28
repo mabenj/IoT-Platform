@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
-import { Device } from "../../../interfaces/device.interface";
-
-interface LocationState {
-    device: Device;
-}
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { DevicesContext } from "./App";
 
 export default function DeviceBreadcrumb() {
     const { deviceId } = useParams();
-    const { state } = useLocation();
-    const [device, setDevice] = useState<Device>();
+    const { devices } = useContext(DevicesContext) || {};
+    const [deviceName, setDeviceName] = useState("Loading...");
 
     useEffect(() => {
-        const deviceFromState = (state as LocationState)?.device;
-        if (deviceFromState) {
-            setDevice(deviceFromState);
+        const currentDevice = devices?.find(({ id }) => id === deviceId);
+        if (currentDevice) {
+            setDeviceName(currentDevice.name);
+        } else {
+            setDeviceName("Unknown Device");
         }
-    }, [deviceId, state]);
+    }, [deviceId, devices]);
 
-    return <span>{device?.name || "Unknown Device"}</span>;
+    return <span>{deviceName}</span>;
 }

@@ -1,40 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
+import { DevicesContext } from "./App";
 import DeviceForm from "./DeviceForm";
 
-interface LocationState {
-    device: Device;
-}
-
 export default function ViewDevice() {
-    const { deviceId } = useParams();
-    const { state } = useLocation();
     const [device, setDevice] = useState<Device>();
+    const { devices, setDevices } = useContext(DevicesContext) || {
+        devices: []
+    };
+    const { deviceId } = useParams();
 
     useEffect(() => {
-        async function fetchDevice() {
-            setDevice(await DeviceService.getDevice(deviceId || ""));
+        const currentDevice = devices.find(({ id }) => id === deviceId);
+        if (currentDevice) {
+            setDevice(currentDevice);
         }
-        const deviceFromState = (state as LocationState)?.device;
-        if (!deviceFromState) {
-            fetchDevice();
-        } else {
-            setDevice(deviceFromState);
-        }
-    }, [deviceId, state]);
+    }, [deviceId, devices]);
 
     const updateDevice = async (newDevice: Device) => {
         const resultDevice = await DeviceService.modifyDevice(newDevice);
         if (resultDevice) {
             setDevice(resultDevice);
+            setDevices &&
+                setDevices((prev) => {
+                    const filtered = prev.filter(
+                        ({ id }) => id !== resultDevice.id
+                    );
+                    return [...filtered, resultDevice];
+                });
         }
     };
 
     return (
         <div>
-            <h2>Device: {device?.name}</h2>
+            <h2>Device Configuration</h2>
             <DeviceForm initialDevice={device} onSubmit={updateDevice} />
         </div>
     );

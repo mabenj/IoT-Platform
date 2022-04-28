@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -8,18 +8,21 @@ import { Link } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
 import { range, sortAlphabetically, timeSince } from "../utils/utils";
+import { DevicesContext } from "./App";
 
 export default function ViewDevices() {
-    const [currentDevices, setCurrentDevices] = useState<Device[]>([]);
+    const { devices, setDevices } = useContext(DevicesContext) || {
+        devices: []
+    };
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function fetchDevices() {
-            setCurrentDevices(await DeviceService.getAllDevices());
+            setDevices && setDevices(await DeviceService.getAllDevices());
             setIsLoading(false);
         }
         fetchDevices();
-    }, []);
+    }, [setDevices]);
 
     return (
         <>
@@ -29,21 +32,23 @@ export default function ViewDevices() {
             </div>
             <ListGroup>
                 {isLoading &&
-                    range(0, 10).map((index) => (
+                    range(1, devices.length || 10).map((index) => (
                         <DevicePlaceholder key={index} />
                     ))}
-                {sortAlphabetically(currentDevices, "name").map((device) => (
-                    <DeviceItem
-                        key={device.id}
-                        device={device}
-                        onDeleteDevice={() =>
-                            setCurrentDevices((prev) =>
-                                prev.filter(({ id }) => id !== device.id)
-                            )
-                        }
-                    />
-                ))}
-                {currentDevices.length < 1 && !isLoading && (
+                {!isLoading &&
+                    sortAlphabetically(devices, "name").map((device) => (
+                        <DeviceItem
+                            key={device.id}
+                            device={device}
+                            onDeleteDevice={() =>
+                                setDevices &&
+                                setDevices((prev) =>
+                                    prev.filter(({ id }) => id !== device.id)
+                                )
+                            }
+                        />
+                    ))}
+                {devices.length < 1 && !isLoading && (
                     <Alert variant="warning">
                         No registered devices could be found — Register a new
                         device{" "}

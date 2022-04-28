@@ -1,37 +1,33 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Placeholder from "react-bootstrap/Placeholder";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceDataService from "../services/DeviceDataService";
-import DeviceService from "../services/DeviceService";
 import { range } from "../utils/utils";
-
-interface LocationState {
-    device: Device;
-}
+import { DevicesContext } from "./App";
 
 export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
     const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
     const [isFetchingData, setIsFetchingData] = useState(false);
+    const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
-    const { state } = useLocation();
 
     const resolveDeviceAndData = useCallback(async () => {
         setIsFetchingData(true);
-        const deviceFromState = (state as LocationState)?.device;
-        const currentDevice =
-            deviceFromState || (await DeviceService.getDevice(deviceId!));
-        const deviceData = await DeviceDataService.getDeviceData(
-            currentDevice.id!,
-            0,
-            20
-        );
-        setDevice(currentDevice);
-        setDeviceData(deviceData);
+        const currentDevice = devices.find(({ id }) => id === deviceId);
+        if (currentDevice) {
+            const deviceData = await DeviceDataService.getDeviceData(
+                currentDevice.id!,
+                0,
+                20
+            );
+            setDevice(currentDevice);
+            setDeviceData(deviceData);
+        }
         setIsFetchingData(false);
-    }, [deviceId, state]);
+    }, [deviceId, devices]);
 
     useEffect(() => {
         async function fetchDeviceAndData() {
