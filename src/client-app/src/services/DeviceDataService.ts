@@ -38,8 +38,7 @@ async function exportAllDeviceData(deviceId: string) {
 }
 
 async function deleteAllDeviceData(deviceId: string) {
-    //TODO
-    throw new Error("Not implemented");
+    await axios.delete(`/api/deviceData/${deviceId}`);
 }
 
 const DeviceDataService = {

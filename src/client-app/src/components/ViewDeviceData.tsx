@@ -79,26 +79,40 @@ export default function ViewDeviceData() {
         setIsExporting(false);
     };
 
+    const deleteAllData = async () => {
+        await DeviceDataService.deleteAllDeviceData(device?.id!);
+        setDeviceData(new Map());
+        setTotalDeviceDataCount(0);
+    };
+
     return (
         <div>
             <h2>Device Data - {device?.name}</h2>
             <Col sm={8}>
-                <Button
-                    title="Export all device data as JSON"
-                    className="mt-4"
-                    disabled={deviceData.size < 1 || isExporting}
-                    onClick={() => exportData()}>
-                    {isExporting ? (
-                        <Spinner
-                            animation="border"
-                            size="sm"
-                            className="me-2"
-                        />
-                    ) : (
-                        <span className="mdi mdi-cloud-download"></span>
-                    )}{" "}
-                    Export JSON
-                </Button>
+                <div className="mt-4">
+                    <Button
+                        title="Export all device data as JSON"
+                        disabled={deviceData.size < 1 || isExporting}
+                        className="me-3"
+                        onClick={() => exportData()}>
+                        {isExporting ? (
+                            <Spinner
+                                animation="border"
+                                size="sm"
+                                className="me-2"
+                            />
+                        ) : (
+                            <span className="mdi mdi-cloud-download"></span>
+                        )}{" "}
+                        Export JSON
+                    </Button>
+                    <Button
+                        title="Delete all device data"
+                        onClick={() => deleteAllData()}
+                        disabled={deviceData.size < 1 || isExporting}>
+                        <span className="mdi mdi-delete"></span> Delete All Data
+                    </Button>
+                </div>
                 <small className="text-muted d-block mt-4">
                     Showing {deviceData.size} out of {totalDeviceDataCount}{" "}
                     entries
