@@ -1,7 +1,6 @@
 import coap = require("coap");
 import axios from "axios";
 import CoapApiConfig from "../configs/coap-api.config";
-import DemoConfig from "../configs/demo.config";
 import HttpApiConfig from "../configs/http-api.config";
 import {
     generateRandomCarData,
@@ -12,75 +11,85 @@ import {
 } from "../utils/utils";
 import Logger from "./logger";
 
-async function main() {
-    Logger.info(
-        `Generating random device data of type '${DemoConfig.deviceType}'`
-    );
+async function main(args: string[]) {
+    if (args.length < 5) {
+        console.log("USAGE:");
+        console.log(
+            "  demo-device (<http> | <coap>) <access_token> (<car> | <water> | <weather> | <words>) <count> <interval_in_ms>"
+        );
+        console.log("  Example: http 3U9L5gA57U weather 15 5000");
+        return;
+    }
+    const [protocol, accessToken, dataType, count, intervalMs] = args;
+    const config = {
+        protocol,
+        accessToken,
+        dataType,
+        count: Number(count),
+        intervalMs: Number(intervalMs)
+    };
+    Logger.info(`Generating random device data of type '${config.dataType}'`);
     let deviceData: any[];
-    switch (DemoConfig.deviceType.toLowerCase()) {
+    switch (dataType.toLowerCase()) {
         case "car": {
-            deviceData = generateRandomCarData(DemoConfig.count);
+            deviceData = generateRandomCarData(config.count);
             break;
         }
         case "water": {
-            deviceData = generateRandomWaterData(DemoConfig.count);
+            deviceData = generateRandomWaterData(config.count);
             break;
         }
         case "weather": {
-            deviceData = generateRandomWeatherData(DemoConfig.count);
+            deviceData = generateRandomWeatherData(config.count);
             break;
         }
         case "words": {
-            deviceData = generateRandomData(DemoConfig.count);
+            deviceData = generateRandomData(config.count);
             break;
         }
         default: {
-            deviceData = generateRandomData(DemoConfig.count);
+            deviceData = generateRandomData(config.count);
             break;
         }
     }
-    switch (DemoConfig.protocol) {
+    switch (protocol.toLocaleLowerCase()) {
         case "http": {
-            await sendHttpData(deviceData);
+            sendHttpData(deviceData, config);
             break;
         }
         case "coap": {
-            await sendCoapData(deviceData);
+            await sendCoapData(deviceData, config);
             break;
         }
         default: {
-            await sendHttpData(deviceData);
+            await sendHttpData(deviceData, config);
             break;
         }
     }
-    process.exit(0);
 }
 
-async function sendCoapData(data: any[]) {
-    for (let i = 0; i < DemoConfig.count; i++) {
+async function sendCoapData(data: any[], config: any) {
+    for (let i = 0; i < config.count; i++) {
         const req = coap.request({
             host: "localhost",
             port: Number(CoapApiConfig.port),
             method: "POST",
-            pathname: `/${DemoConfig.accessToken}`
+            pathname: `/${config.accessToken}`
         });
         req.write(JSON.stringify(data[i]));
         req.on("response", (res: coap.IncomingMessage) => {
             Logger.info(`RESPONSE: [${res.code}] ${res.payload.toString()}`);
-            res.on("end", () => {
-                process.exit(0);
-            });
         });
         req.end();
-        await sleep(DemoConfig.intervalMs);
+        await sleep(config.intervalMs);
     }
 }
 
-async function sendHttpData(data: any[]) {
-    for (let i = 0; i < DemoConfig.count; i++) {
+async function sendHttpData(data: any[], config: any) {
+    for (let i = 0; i < config.count; i++) {
         axios
             .post(
-                `http://localhost:${HttpApiConfig.port}/${DemoConfig.accessToken}`,
+                `http://localhost:${HttpApiConfig.port}/${config.accessToken}`,
                 data[i]
             )
             .then((response) => Logger.info(`RESPONSE: [${response.status}]`))
@@ -89,10 +98,10 @@ async function sendHttpData(data: any[]) {
                     `RESPONSE: [${error.response.status}] ${error.response.data}`
                 )
             );
-        await sleep(DemoConfig.intervalMs);
+        await sleep(config.intervalMs);
     }
 }
 
 if (require.main === module) {
-    main();
+    main(process.argv.slice(2));
 }
