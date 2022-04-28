@@ -2,13 +2,36 @@
 
 A simple and lightweight IoT platform made as part of _Communication Technologies and Security in IoT_ course.
 
-The backend APIs are written in TypeScript using [Node.js](https://nodejs.org/en/docs/) and [Express](https://expressjs.com/en/4x/api.html). Database access is handled with [Mongoose](https://mongoosejs.com/docs/guide.html). And [node-coap](https://github.com/mcollina/node-coap) library, alongside with Express, is used to handle the CoAP traffic coming from end-devices.
+The backend APIs are written in TypeScript using [Node.js](https://nodejs.org/en/docs/) and [Express.js](https://expressjs.com/en/4x/api.html). Database access is handled with [Mongoose](https://mongoosejs.com/docs/guide.html). And [node-coap](https://github.com/mcollina/node-coap) library, alongside with Express, is used to handle the CoAP traffic coming from end-devices.
 
 The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/documentation-intro) application written also in TypeScript. The UI components used are mainly provided by [React-Bootstrap](https://react-bootstrap.github.io/getting-started/introduction/).
+
+# Table of Contents
+
+- [IoT Platform](#iot-platform)
+- [Table of Contents](#table-of-contents)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Development](#development)
+  - [Database Connection](#database-connection)
+  - [Usage](#usage)
+    - [Registering a device](#registering-a-device)
+    - [Managing devices](#managing-devices)
+    - [Accessing device data](#accessing-device-data)
+    - [Sending device data](#sending-device-data)
+    - [Programmatic usage](#programmatic-usage)
+  - [Web API endpoints](#web-api-endpoints)
+    - [/api/devices](#apidevices)
+    - [/api/deviceData](#apidevicedata)
+  - [HTTP API endpoints](#http-api-endpoints)
+    - [/{accessToken}](#accesstoken)
+  - [CoAP API endpoints](#coap-api-endpoints)
+    - [/{accessToken}](#accesstoken-1)
 
 ## Prerequisites
 
 -   node and npm
+-   MongoDB database
 -   TypeScript
     `npm install -g typescript`
 
@@ -20,6 +43,7 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 4. `npm run build`
 5. Configure MongoDB connection (see [Database Connection](#database-connection))
 6. `npm start`
+7. View the UI in the browser http://localhost:7000
 
 ## Development
 
@@ -45,13 +69,42 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ## Database Connection
 
-Connection to MongoDB requires the following entries in a `.env` file located in the root directory
+Connection to MongoDB requires the following entries in a `.env` file located in the root directory.
 
 `MONGO_USERNAME=<username>`
 
 `MONGO_PASSWORD=<password>`
 
 `MONGO_HOST=<host (e.g. cluster1337.foobar.mongodb.net/iot-platform)>`
+
+## Usage
+
+### Registering a device
+
+<img src="https://i.imgur.com/29icufS.png" width="500">
+
+New devices can be registered in the **Register a Device** page. When registering a device, you must specify a name, optional description, status (enabled or disabled), communication protocol, and an access token. The access token is used to send data from the end-devices to the IoT platform.
+
+### Managing devices
+
+<img src="https://i.imgur.com/BzdfHSh.png" width="500">
+<img src="https://i.imgur.com/Rzy1sfM.png" width="500">
+
+Registered devices can be viewed in the **View Devices** page. From there you can delete a device by pressing the corresponding red **delete** button. To view or update a device's configuration, you must select a device from the list. This will navigate you to the device's configration page where you can view and update the configuration.
+
+### Accessing device data
+
+<img src="https://i.imgur.com/S1A03DK.png" width="500">
+
+To view the received device data, you must press the **View Device Data** button while not modifying the device in the device's configuration page. In the device data page you can view the most recent received data, export all of the device data (JSON), or delete all of the device data.
+
+### Sending device data
+
+To send device data to the platform, you must perform an appropriate request to an API endpoint with a valid access token. Reference [HTTP API endpoints](#http-api-endpoints) or [CoAP API endpoints](#coap-api-endpoints) to make the requests. If the device that the access token belongs to is disabled or if it does not exist, the token is not valid.
+
+### Programmatic usage
+
+To fetch device data and to create and modify devices via a REST interface, reference [Web API endpoints](#web-api-endpoints) on how to do it.
 
 ## Web API endpoints
 
@@ -60,22 +113,6 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 ### /api/devices
 
 -   `GET /api/devices` Gets all the registered devices
-
-    ```
-    Response Body:
-    {
-       id: <string>
-       name: <string>,
-       accessToken: <string>,
-       enabled: <boolean>,
-       protocol: "http" | "coap",
-       description: <string>,
-       createdAt: Date,
-       updatedAt: Date,
-    }
-    ```
-
--   `GET /api/devices/{id}` Gets a registered device that has the corresponding id
 
     ```
     Response Body:
@@ -94,7 +131,23 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
     ]
     ```
 
--   `POST /api/devices` Registers a new device provided in the request body
+-   `GET /api/devices/{id}` Gets a registered device that has the corresponding id
+
+    ```
+    Response Body:
+    {
+       id: <string>
+       name: <string>,
+       accessToken: <string>,
+       enabled: <boolean>,
+       protocol: "http" | "coap",
+       description: <string>,
+       createdAt: Date,
+       updatedAt: Date,
+    }
+    ```
+
+-   `POST /api/devices` Registers a new device
 
     ```
      Request Body:
@@ -150,7 +203,7 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 
 ### /api/deviceData
 
--   `GET /api/deviceData/{id}?start={startIndex}&stop={stopIndex}` Gets all the device data associated with a device that has the corresponding id starting from start index to stop index.
+-   `GET /api/deviceData/{id}?start={startIndex}&stop={stopIndex}` Gets the device data associated with a device that has the corresponding id starting from start index to stop index. Leaving start index or end index undefined, will result in all of the data being returned.
 
 ```
   Response Body:
@@ -172,6 +225,8 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 
 ## HTTP API endpoints
 
+### /{accessToken}
+
 HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 7100)
 
 -   `POST /{accessToken}`
@@ -184,6 +239,8 @@ HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 71
     ```
 
 ## CoAP API endpoints
+
+### /{accessToken}
 
 CoAP API port can be configured with `COAP_PORT` in the `.env` file. (Default 7200)
 
