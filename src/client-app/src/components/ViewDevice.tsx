@@ -26,6 +26,13 @@ export default function ViewDevice() {
         }
     }, [deviceId, state]);
 
+    const updateDevice = async (newDevice: Device) => {
+        const resultDevice = await DeviceService.modifyDevice(newDevice);
+        if(resultDevice){
+            setDevice(resultDevice)
+        }
+    }
+
     return (
         <div>
             <h3>Device: {device?.name}</h3>
@@ -38,7 +45,7 @@ export default function ViewDevice() {
             <br />
             <DeviceForm
                 initialDevice={device}
-                onSubmit={async (device) => console.log(device)}
+                onSubmit={updateDevice}
             />
             TODO: view device data, export device data(csv/json?)
         </div>

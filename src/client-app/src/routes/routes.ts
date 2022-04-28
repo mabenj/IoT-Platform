@@ -11,12 +11,12 @@ const Routes = [
     { path: "/home", breadcrumb: "Home", Component: Home },
     {
         path: "/viewDevices",
-        breadcrumb: "View Devices",
+        breadcrumb: "Devices",
         Component: ViewDevices
     },
     {
         path: `/viewDevices/:deviceId/viewData`,
-        breadcrumb: "View Data",
+        breadcrumb: "Device Data",
         Component: ViewData
     },
     {
