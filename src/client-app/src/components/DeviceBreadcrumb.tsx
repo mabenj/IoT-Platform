@@ -1,5 +1,5 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 
 interface LocationState {
@@ -7,7 +7,16 @@ interface LocationState {
 }
 
 export default function DeviceBreadcrumb() {
+    const { deviceId } = useParams();
     const { state } = useLocation();
-    const deviceFromState = (state as LocationState)?.device;
-    return <span>{deviceFromState.name}</span>;
+    const [device, setDevice] = useState<Device>();
+
+    useEffect(() => {
+        const deviceFromState = (state as LocationState)?.device;
+        if (deviceFromState) {
+            setDevice(deviceFromState);
+        }
+    }, [deviceId, state]);
+
+    return <span>{device?.name || "Unknown Device"}</span>;
 }

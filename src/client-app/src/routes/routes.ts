@@ -2,7 +2,7 @@ import DeviceBreadcrumb from "../components/DeviceBreadcrumb";
 import Home from "../components/Home";
 import NotFound from "../components/NotFound";
 import RegisterDevice from "../components/RegisterDevice";
-import ViewData from "../components/ViewData";
+import ViewData from "../components/ViewDeviceData";
 import ViewDevice from "../components/ViewDevice";
 import ViewDevices from "../components/ViewDevices";
 

@@ -7,7 +7,7 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 
 const ACCESS_TOKEN_REGEX = "[a-zA-Z0-9]{8,}";
@@ -327,9 +327,18 @@ export default function DeviceForm({
                             </Button>
                         </>
                     ) : (
-                        <Button variant="primary" type="submit">
-                            Modify Device
-                        </Button>
+                        <>
+                            <Button variant="primary" type="submit">
+                                Modify Device
+                            </Button>
+                            <Link
+                                to={`/viewDevices/${initialDevice?.id}/viewdata`}
+                                state={{ device: initialDevice }}>
+                                <Button className="mx-3">
+                                    View Device Data
+                                </Button>
+                            </Link>
+                        </>
                     )}
                 </ValueCol>
             </Row>
