@@ -8,9 +8,9 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ## Prerequisites
 
-- node and npm
-- TypeScript
-  `npm install -g typescript`
+-   node and npm
+-   TypeScript
+    `npm install -g typescript`
 
 ## Installation
 
@@ -27,21 +27,21 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 2. `cd IoT-Platform`
 3. **Back-end**
 
-   2.1 `npm install`
+    2.1 `npm install`
 
-   2.2 Configure MongoDB connection (see [Database Connection](#database-connection))
+    2.2 Configure MongoDB connection (see [Database Connection](#database-connection))
 
-   2.3 `npm run dev`
+    2.3 `npm run dev:api`
 
-3. **Front-end**
+4. **Front-end**
 
-   3.1 `cd src/client-app`
+    3.1 `cd src/client-app`
 
-   3.2 `npm install`
+    3.2 `npm install`
 
-   3.3 `npm start`
-   
-   3.4 View the UI in browser http://localhost:3000
+    3.3 `npm run dev:client`
+
+    3.4 View the UI in browser http://localhost:3000
 
 ## Database Connection
 
@@ -59,98 +59,98 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 
 ### /api/devices
 
-- `GET /api/devices` Gets all the registered devices
+-   `GET /api/devices` Gets all the registered devices
 
-  ```
-  Response Body:
-  {
-     id: <string>
-     name: <string>,
-     accessToken: <string>,
-     enabled: <boolean>,
-     protocol: "http" | "coap",
-     description: <string>,
-     createdAt: Date,
-     updatedAt: Date,
-  }
-  ```
-
-- `GET /api/devices/{id}` Gets a registered device that has the corresponding id
-
-  ```
-  Response Body:
-  [
+    ```
+    Response Body:
     {
-        id: <string>
-        name: <string>,
-        accessToken: <string>,
-        enabled: <boolean>,
-        protocol: "http" | "coap",
-        description: <string>,
-        createdAt: Date,
-        updatedAt: Date,
-    },
-    ...
-  ]
-  ```
-
-- `POST /api/devices` Registers a new device provided in the request body
-
-  ```
-   Request Body:
-   {
+       id: <string>
        name: <string>,
        accessToken: <string>,
        enabled: <boolean>,
-       protocol: "http" | "coap"
+       protocol: "http" | "coap",
+       description: <string>,
+       createdAt: Date,
+       updatedAt: Date,
     }
-  ```
+    ```
 
-  ```
-  Response Body:
-  {
-     id: <string>
-     name: <string>,
-     accessToken: <string>,
-     enabled: <boolean>,
-     protocol: "http" | "coap",
-     description: <string>,
-     createdAt: Date,
-     updatedAt: Date,
-  }
-  ```
+-   `GET /api/devices/{id}` Gets a registered device that has the corresponding id
 
-- `PUT /api/devices/{id}` Modifies a registered device that has the corresponding id with the details provided in the body
+    ```
+    Response Body:
+    [
+      {
+          id: <string>
+          name: <string>,
+          accessToken: <string>,
+          enabled: <boolean>,
+          protocol: "http" | "coap",
+          description: <string>,
+          createdAt: Date,
+          updatedAt: Date,
+      },
+      ...
+    ]
+    ```
 
-  ```
-   Request Body:
-   {
-       name?: <string>,
-       accessToken?: <string>,
-       enabled?: <boolean>,
-       protocol?: "http" | "coap"
-   }
-  ```
+-   `POST /api/devices` Registers a new device provided in the request body
 
-  ```
-  Response Body:
-  {
-     id: <string>
-     name: <string>,
-     accessToken: <string>,
-     enabled: <boolean>,
-     protocol: "http" | "coap",
-     description: <string>,
-     createdAt: Date,
-     updatedAt: Date,
-  }
-  ```
+    ```
+     Request Body:
+     {
+         name: <string>,
+         accessToken: <string>,
+         enabled: <boolean>,
+         protocol: "http" | "coap"
+      }
+    ```
 
-- `DELETE /api/device/{id}` Deletes a registered device that has the corresponding id
+    ```
+    Response Body:
+    {
+       id: <string>
+       name: <string>,
+       accessToken: <string>,
+       enabled: <boolean>,
+       protocol: "http" | "coap",
+       description: <string>,
+       createdAt: Date,
+       updatedAt: Date,
+    }
+    ```
+
+-   `PUT /api/devices/{id}` Modifies a registered device that has the corresponding id with the details provided in the body
+
+    ```
+     Request Body:
+     {
+         name?: <string>,
+         accessToken?: <string>,
+         enabled?: <boolean>,
+         protocol?: "http" | "coap"
+     }
+    ```
+
+    ```
+    Response Body:
+    {
+       id: <string>
+       name: <string>,
+       accessToken: <string>,
+       enabled: <boolean>,
+       protocol: "http" | "coap",
+       description: <string>,
+       createdAt: Date,
+       updatedAt: Date,
+    }
+    ```
+
+-   `DELETE /api/device/{id}` Deletes a registered device that has the corresponding id
 
 ### /api/deviceData
 
-- `GET /api/deviceData/{id}` Gets all the device data associated with a device that has the corresponding id
+-   `GET /api/deviceData/{id}` Gets all the device data associated with a device that has the corresponding id
 
 ```
   Response Body:
@@ -165,30 +165,30 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
   ]
 ```
 
-- `DELETE /api/deviceData/{id}`
+-   `DELETE /api/deviceData/{id}`
 
 ## HTTP API endpoints
 
 HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 7100)
 
-- `POST /{accessToken}`
+-   `POST /{accessToken}`
 
-  ```
-  Body:
-  {
-      [key: <string>]: any
-  }
-  ```
+    ```
+    Body:
+    {
+        [key: <string>]: any
+    }
+    ```
 
 ## CoAP API endpoints
 
 CoAP API port can be configured with `COAP_PORT` in the `.env` file. (Default 7200)
 
-- `POST /{accessToken}`
+-   `POST /{accessToken}`
 
-  ```
-  Body:
-  {
-      [key: <string>]: any
-  }
-  ```
+    ```
+    Body:
+    {
+        [key: <string>]: any
+    }
+    ```
