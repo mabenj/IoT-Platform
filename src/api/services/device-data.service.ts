@@ -17,7 +17,7 @@ async function getMostRecentDeviceData(
     if (start && stop) {
         const deviceData =
             (await DeviceData.find({ deviceId })
-                .sort({ createdAt: "asc" })
+                .sort({ createdAt: -1 })
                 .limit(stop)
                 .skip(start)
                 .exec()) || [];
