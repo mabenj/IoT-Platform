@@ -11,17 +11,11 @@ const Logger = Log.app;
 
 class App {
     private isProd = process.env.NODE_ENV?.trim() === "production";
-    private useWebApi = true;
-    private useHttpApi = true;
-    private useCoapApi = true;
+    private useWebApi = WebApiConfig.port > 0;
+    private useHttpApi = HttpApiConfig.port > 0;
+    private useCoapApi = CoapApiConfig.port > 0;
 
-    constructor(args: string[]) {
-        if (args.length > 0) {
-            this.useWebApi = args.includes("web");
-            this.useHttpApi = args.includes("http");
-            this.useCoapApi = args.includes("coap");
-        }
-    }
+    constructor() {}
 
     public async start() {
         await this.initializeDatabase();
@@ -75,5 +69,5 @@ class App {
 }
 
 if (require.main === module) {
-    new App(process.argv.slice(2)).start();
+    new App().start();
 }
