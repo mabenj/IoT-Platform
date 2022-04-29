@@ -8,6 +8,8 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ### Live Demo<!-- omit in toc -->
 
+Only Web API, no HTTP or CoAP API
+
 https://simple-iot-platform.herokuapp.com/
 
 # Table of Contents<!-- omit in toc -->
