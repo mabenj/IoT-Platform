@@ -6,6 +6,10 @@ The backend APIs are written in TypeScript using [Node.js](https://nodejs.org/en
 
 The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/documentation-intro) application written also in TypeScript. The UI components used are mainly provided by [React-Bootstrap](https://react-bootstrap.github.io/getting-started/introduction/).
 
+### Live Demo<!-- omit in toc -->
+
+https://simple-iot-platform.herokuapp.com/
+
 # Table of Contents<!-- omit in toc -->
 
 -   [Installation](#installation)
