@@ -14,7 +14,7 @@ import DeviceDataService from "../services/DeviceDataService";
 import { range, timeSince } from "../utils/utils";
 import { DevicesContext } from "./App";
 
-const CHUNK_SIZE = 100;
+const CHUNK_SIZE = 200;
 
 export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
@@ -26,7 +26,7 @@ export default function ViewDeviceData() {
         CHUNK_SIZE
     ]);
     const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
-    const [isFetchingData, setIsFetchingData] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(true);
     const [isExporting, setIsExporting] = useState(false);
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
@@ -137,7 +137,7 @@ export default function ViewDeviceData() {
                         <strong>{device?.name}</strong>'
                     </Alert>
                 )}
-                {!isFetchingData && totalDeviceDataCount > 20 && (
+                {!isFetchingData && totalDeviceDataCount > deviceData.size && (
                     <Alert variant="warning" className="mt-5">
                         Only the first {deviceData.size} entries are shown
                     </Alert>

@@ -1,7 +1,6 @@
 import { customAlphabet } from "nanoid";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import Button from "react-bootstrap/Button";
-import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -264,38 +263,41 @@ export default function DeviceForm({
                     </ValueCol>
                     <ValueCol hidden={isEditing}>
                         <ValueField>
-                            <span className="d-flex justify-content-between">
+                            <span
+                                className="d-inline-block"
+                                style={{
+                                    width: `${
+                                        (initialDevice?.accessToken?.length ||
+                                            0) * 12
+                                    }px`
+                                }}>
                                 {getAccessTokenString(
                                     initialDevice?.accessToken || ""
                                 )}
-                                <ButtonGroup>
-                                    <Button
-                                        variant="outline-secondary"
-                                        onClick={() =>
-                                            setIsAccessTokenVisible(
-                                                (prev) => !prev
-                                            )
-                                        }
-                                        title={
-                                            isAccessTokenVisible
-                                                ? "Hide access token"
-                                                : "Show access token"
-                                        }>
-                                        {isAccessTokenVisible ? (
-                                            <span className="mdi mdi-eye-off"></span>
-                                        ) : (
-                                            <span className="mdi mdi-eye"></span>
-                                        )}
-                                    </Button>
-                                    <Button
-                                        variant="outline-secondary"
-                                        onClick={() => copyAccessToken()}
-                                        title="Copy to clipboard"
-                                        disabled={isRegistering}>
-                                        <span className="mdi mdi-content-copy"></span>
-                                    </Button>
-                                </ButtonGroup>
                             </span>
+                            <Button
+                                variant=""
+                                onClick={() =>
+                                    setIsAccessTokenVisible((prev) => !prev)
+                                }
+                                title={
+                                    isAccessTokenVisible
+                                        ? "Hide access token"
+                                        : "Show access token"
+                                }>
+                                {isAccessTokenVisible ? (
+                                    <span className="mdi mdi-eye-off"></span>
+                                ) : (
+                                    <span className="mdi mdi-eye"></span>
+                                )}
+                            </Button>
+                            <Button
+                                variant=""
+                                onClick={() => copyAccessToken()}
+                                title="Copy to clipboard"
+                                disabled={isRegistering}>
+                                <span className="mdi mdi-content-copy"></span>
+                            </Button>
                         </ValueField>
                     </ValueCol>
                 </Row>
