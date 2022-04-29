@@ -11,7 +11,7 @@
         "start": "cross-env NODE_ENV=production node dist/api/app.js",
         "dev:api": "nodemon --ignore src/api/demo src/api/app.ts",
         "dev:client": "cd src/client-app && npm run dev:client",
-        "demo-device": "ts-node src/api/demo/sendDeviceData.ts"
+        "demo-device": "npx ts-node src/api/demo/sendDeviceData.ts"
     },
     "dependencies": {
         "axios": "^0.27.2",
