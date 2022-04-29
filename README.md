@@ -22,6 +22,7 @@ https://simple-iot-platform.herokuapp.com/
     -   [Accessing device data](#accessing-device-data)
     -   [Sending device data](#sending-device-data)
     -   [Programmatic usage](#programmatic-usage)
+    -   [Simulating Sending of Data from End-Node](#simulating-sending-of-data-from-end-node)
 -   [Web API endpoints](#web-api-endpoints)
     -   [/api/devices](#apidevices)
     -   [/api/deviceData](#apidevicedata)
@@ -106,6 +107,18 @@ To send device data to the platform, you must perform an appropriate request to 
 ### Programmatic usage
 
 To fetch device data and to create and modify devices via a REST interface, reference [Web API endpoints](#web-api-endpoints) on how to do it.
+
+### Simulating Sending of Data from End-Node
+
+To simulate an end-device sending data to the platform, the project contains a npm script that can mock HTTP or CoAP requests. To use the script run `npm run demo-device <protocol> <host> <port> <access_token> <data_type> <count> <interval>` where:
+
+-   `protocol` is http or coap
+-   `host` is the IP address (e.g. localhost)
+-   `port` is the API port
+-   `access_token` is the access token of a valid registered device
+-   `data_type` is the type of the demo data set, options are car water weather words
+-   `count` is the number of requests to be made
+-   `interval` is the request interval in milli seconds
 
 ## Web API endpoints
 

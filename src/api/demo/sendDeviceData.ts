@@ -1,7 +1,5 @@
 import coap = require("coap");
 import axios from "axios";
-import CoapApiConfig from "../configs/coap-api.config";
-import HttpApiConfig from "../configs/http-api.config";
 import {
     generateRandomCarData,
     generateRandomData,
@@ -12,17 +10,22 @@ import {
 import Logger from "./logger";
 
 async function main(args: string[]) {
-    if (args.length < 5) {
+    if (args.length < 7) {
         console.log("USAGE:");
         console.log(
-            "  demo-device (<http> | <coap>) <access_token> (<car> | <water> | <weather> | <words>) <count> <interval_in_ms>"
+            "  demo-device (<http> | <coap>) <host> <port> <access_token> (<car> | <water> | <weather> | <words>) <count> <interval_in_ms>"
         );
-        console.log("  Example: http 3U9L5gA57U weather 15 5000");
+        console.log(
+            "  Example: http localhost 7100 3U9L5gA57U weather 15 5000"
+        );
         return;
     }
-    const [protocol, accessToken, dataType, count, intervalMs] = args;
+    const [protocol, host, port, accessToken, dataType, count, intervalMs] =
+        args;
     const config = {
         protocol,
+        host,
+        port,
         accessToken,
         dataType,
         count: Number(count),
@@ -71,8 +74,8 @@ async function main(args: string[]) {
 async function sendCoapData(data: any[], config: any) {
     for (let i = 0; i < config.count; i++) {
         const req = coap.request({
-            host: "localhost",
-            port: Number(CoapApiConfig.port),
+            hostname: config.host,
+            port: config.port,
             method: "POST",
             pathname: `/${config.accessToken}`
         });
@@ -89,7 +92,7 @@ async function sendHttpData(data: any[], config: any) {
     for (let i = 0; i < config.count; i++) {
         axios
             .post(
-                `http://localhost:${HttpApiConfig.port}/${config.accessToken}`,
+                `http://${config.host}:${config.port}/${config.accessToken}`,
                 data[i]
             )
             .then((response) => Logger.info(`RESPONSE: [${response.status}]`))
