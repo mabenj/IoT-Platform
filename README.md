@@ -12,7 +12,6 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
     -   [Prerequisites](#prerequisites)
     -   [Running locally](#running-locally)
     -   [Development](#development)
-    -   [Database Connection](#database-connection)
 -   [Usage](#usage)
     -   [Registering a device](#registering-a-device)
     -   [Managing devices](#managing-devices)
@@ -31,10 +30,19 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ### Prerequisites
 
--   node and npm
--   MongoDB database
+-   node (and npm)
+    -   https://nodejs.org/en/download/
 -   TypeScript
-    `npm install -g typescript`
+    -   install with `npm install -g typescript`
+-   MongoDB database
+
+    -   Connection to MongoDB requires a `.env` file in the root directory with the following entries in it:
+
+        `MONGO_USERNAME=<username>`
+
+        `MONGO_PASSWORD=<password>`
+
+        `MONGO_HOST=<host (e.g. cluster1337.foobar.mongodb.net/iot-platform)>`
 
 ### Running locally
 
@@ -42,10 +50,9 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 2. `cd IoT-Platform`
 3. `npm install`
 4. `npm run build`
-5. Configure MongoDB connection (see [Database Connection](#database-connection))
-6. `npm start`
-7. View the UI in the browser http://localhost:7000
-8. Consume the REST API at http://localhost:7000/api
+5. `npm start`
+6. View the UI in the browser http://localhost:7000
+7. Consume the REST API at http://localhost:7000/api
 
 ### Development
 
@@ -55,9 +62,7 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
     3.1 `npm install`
 
-    3.2 Configure MongoDB connection (see [Database Connection](#database-connection))
-
-    3.3 `npm run dev:api`
+    3.2 `npm run dev:api`
 
 4. **Front-end**
 
@@ -68,16 +73,6 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
     4.3 `npm run dev:client`
 
     4.4 View the UI in browser http://localhost:3000
-
-### Database Connection
-
-Connection to MongoDB requires the following entries in a `.env` file located in the root directory.
-
-`MONGO_USERNAME=<username>`
-
-`MONGO_PASSWORD=<password>`
-
-`MONGO_HOST=<host (e.g. cluster1337.foobar.mongodb.net/iot-platform)>`
 
 ## Usage
 
