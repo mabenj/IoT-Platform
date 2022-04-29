@@ -1,4 +1,4 @@
-# IoT Platform
+# IoT Platform<!-- omit in toc -->
 
 A simple and lightweight IoT platform made as part of _Communication Technologies and Security in IoT_ course.
 
@@ -6,36 +6,37 @@ The backend APIs are written in TypeScript using [Node.js](https://nodejs.org/en
 
 The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/documentation-intro) application written also in TypeScript. The UI components used are mainly provided by [React-Bootstrap](https://react-bootstrap.github.io/getting-started/introduction/).
 
-# Table of Contents
+# Table of Contents<!-- omit in toc -->
 
-- [IoT Platform](#iot-platform)
-- [Table of Contents](#table-of-contents)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Development](#development)
-  - [Database Connection](#database-connection)
-  - [Usage](#usage)
-    - [Registering a device](#registering-a-device)
-    - [Managing devices](#managing-devices)
-    - [Accessing device data](#accessing-device-data)
-    - [Sending device data](#sending-device-data)
-    - [Programmatic usage](#programmatic-usage)
-  - [Web API endpoints](#web-api-endpoints)
-    - [/api/devices](#apidevices)
-    - [/api/deviceData](#apidevicedata)
-  - [HTTP API endpoints](#http-api-endpoints)
-    - [/{accessToken}](#accesstoken)
-  - [CoAP API endpoints](#coap-api-endpoints)
-    - [/{accessToken}](#accesstoken-1)
+-   [Installation](#installation)
+    -   [Prerequisites](#prerequisites)
+    -   [Running locally](#running-locally)
+    -   [Development](#development)
+    -   [Database Connection](#database-connection)
+-   [Usage](#usage)
+    -   [Registering a device](#registering-a-device)
+    -   [Managing devices](#managing-devices)
+    -   [Accessing device data](#accessing-device-data)
+    -   [Sending device data](#sending-device-data)
+    -   [Programmatic usage](#programmatic-usage)
+-   [Web API endpoints](#web-api-endpoints)
+    -   [/api/devices](#apidevices)
+    -   [/api/deviceData](#apidevicedata)
+-   [HTTP API endpoints](#http-api-endpoints)
+    -   [/{accessToken}](#accesstoken)
+-   [CoAP API endpoints](#coap-api-endpoints)
+    -   [/{accessToken}](#accesstoken-1)
 
-## Prerequisites
+## Installation
+
+### Prerequisites
 
 -   node and npm
 -   MongoDB database
 -   TypeScript
     `npm install -g typescript`
 
-## Installation
+### Running locally
 
 1. `git clone`
 2. `cd IoT-Platform`
@@ -44,30 +45,31 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 5. Configure MongoDB connection (see [Database Connection](#database-connection))
 6. `npm start`
 7. View the UI in the browser http://localhost:7000
+8. Consume the REST API at http://localhost:7000/api
 
-## Development
+### Development
 
 1. `git clone`
 2. `cd IoT-Platform`
 3. **Back-end**
 
-    2.1 `npm install`
+    3.1 `npm install`
 
-    2.2 Configure MongoDB connection (see [Database Connection](#database-connection))
+    3.2 Configure MongoDB connection (see [Database Connection](#database-connection))
 
-    2.3 `npm run dev:api`
+    3.3 `npm run dev:api`
 
 4. **Front-end**
 
-    3.1 `cd src/client-app`
+    4.1 `cd src/client-app`
 
-    3.2 `npm install`
+    4.2 `npm install`
 
-    3.3 `npm run dev:client`
+    4.3 `npm run dev:client`
 
-    3.4 View the UI in browser http://localhost:3000
+    4.4 View the UI in browser http://localhost:3000
 
-## Database Connection
+### Database Connection
 
 Connection to MongoDB requires the following entries in a `.env` file located in the root directory.
 
@@ -225,9 +227,9 @@ Web API port can be configured with `WEB_PORT` in the `.env` file. (Default 7000
 
 ## HTTP API endpoints
 
-### /{accessToken}
-
 HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 7100)
+
+### /{accessToken}
 
 -   `POST /{accessToken}`
 
@@ -240,9 +242,9 @@ HTTP API port can be configured with `HTTP_PORT` in the `.env` file. (Default 71
 
 ## CoAP API endpoints
 
-### /{accessToken}
-
 CoAP API port can be configured with `COAP_PORT` in the `.env` file. (Default 7200)
+
+### /{accessToken}
 
 -   `POST /{accessToken}`
 
