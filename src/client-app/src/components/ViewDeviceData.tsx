@@ -171,7 +171,7 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
                         onClick={() => setIsExpanded((prev) => !prev)}></Button>
                 </span>
                 <Card.Subtitle className="text-muted">
-                    <small>{data.id}</small>
+                    <small>ID {data.id}</small>
                 </Card.Subtitle>
                 <Collapse in={isExpanded} className="mt-4">
                     <Card.Text>
