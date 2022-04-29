@@ -10,22 +10,20 @@ import {
 import Logger from "./logger";
 
 async function main(args: string[]) {
-    if (args.length < 7) {
+    if (args.length < 6) {
         console.log("USAGE:");
         console.log(
-            "  demo-device (<http> | <coap>) <host> <port> <access_token> (<car> | <water> | <weather> | <words>) <count> <interval_in_ms>"
+            "  demo-device (<http> | <coap>) <address> <access_token> (<car> | <water> | <weather> | <words>) <count> <interval_in_ms>"
         );
         console.log(
-            "  Example: http localhost 7100 3U9L5gA57U weather 15 5000"
+            "  Example: http localhost:7100 3U9L5gA57U weather 15 5000"
         );
         return;
     }
-    const [protocol, host, port, accessToken, dataType, count, intervalMs] =
-        args;
+    const [protocol, address, accessToken, dataType, count, intervalMs] = args;
     const config = {
         protocol,
-        host,
-        port,
+        address,
         accessToken,
         dataType,
         count: Number(count),
@@ -55,6 +53,7 @@ async function main(args: string[]) {
             break;
         }
     }
+    Logger.info(`Sending device data`);
     switch (protocol.toLocaleLowerCase()) {
         case "http": {
             sendHttpData(deviceData, config);
@@ -72,10 +71,11 @@ async function main(args: string[]) {
 }
 
 async function sendCoapData(data: any[], config: any) {
+    const [host, port] = config.address.split(":");
     for (let i = 0; i < config.count; i++) {
         const req = coap.request({
-            hostname: config.host,
-            port: config.port,
+            hostname: host,
+            port: port,
             method: "POST",
             pathname: `/${config.accessToken}`
         });
@@ -91,14 +91,13 @@ async function sendCoapData(data: any[], config: any) {
 async function sendHttpData(data: any[], config: any) {
     for (let i = 0; i < config.count; i++) {
         axios
-            .post(
-                `http://${config.host}:${config.port}/${config.accessToken}`,
-                data[i]
-            )
-            .then((response) => Logger.info(`RESPONSE: [${response.status}]`))
+            .post(`http://${config.address}/${config.accessToken}`, data[i])
+            .then((response) => Logger.info(`RESPONSE: [${response?.status}]`))
             .catch((error) =>
                 Logger.error(
-                    `RESPONSE: [${error.response.status}] ${error.response.data}`
+                    error.response?.status
+                        ? `RESPONSE: [${error.response?.status}] ${error.response?.data}`
+                        : `ERROR: ${error}`
                 )
             );
         await sleep(config.intervalMs);

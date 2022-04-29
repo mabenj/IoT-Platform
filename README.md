@@ -110,15 +110,16 @@ To fetch device data and to create and modify devices via a REST interface, refe
 
 ### Simulating Sending of Data from End-Node
 
-To simulate an end-device sending data to the platform, the project contains a npm script that can mock HTTP or CoAP requests. To use the script run `npm run demo-device <protocol> <host> <port> <access_token> <data_type> <count> <interval>` where:
+To simulate an end-device sending data to the platform, the project contains a npm script that can mock HTTP or CoAP requests. To use the script run `npm run demo-device <protocol> <address> <access_token> <data_type> <count> <interval>` where:
 
 -   `protocol` is http or coap
--   `host` is the IP address (e.g. localhost)
--   `port` is the API port
+-   `address` is the API address (e.g. localhost:7100)
 -   `access_token` is the access token of a valid registered device
--   `data_type` is the type of the demo data set, options are car water weather words
+-   `data_type` is the type of the demo data set, options are car, water, weather, word
 -   `count` is the number of requests to be made
 -   `interval` is the request interval in milli seconds
+
+Example: `npm run demo-device http localhost:7100 superSecret123 word 5 0`
 
 ## Web API endpoints
 
