@@ -30,7 +30,7 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ### Prerequisites
 
--   node (and npm)
+-   Node (and npm)
     -   https://nodejs.org/en/download/
 -   TypeScript
     -   install with `npm install -g typescript`
