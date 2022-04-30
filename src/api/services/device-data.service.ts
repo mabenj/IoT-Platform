@@ -1,6 +1,8 @@
 import { DeviceData as DeviceDataInterface } from "../../interfaces/device-data.interface";
 import { GetDeviceDataResponse } from "../../interfaces/get-device-data-response.interface";
 import DeviceData from "../models/device-data.model";
+import { getDateString } from "../utils/utils";
+import DeviceService from "./device.service";
 
 async function getAllDeviceData(
     deviceId: string
@@ -42,9 +44,20 @@ async function removeDeviceData(deviceId: string) {
     await DeviceData.deleteMany({ deviceId: deviceId }).exec();
 }
 
+async function exportToJson(deviceId: string) {
+    const allDeviceData = await getAllDeviceData(deviceId);
+    const deviceName = (await DeviceService.getDevice(deviceId)).name.replace(/[^a-z0-9]/gi, '_');
+    const json = JSON.stringify(allDeviceData);
+    const filename = `Device_data_${deviceName}_${getDateString(
+        new Date()
+    )}.json`;
+    return { json, filename };
+}
+
 export default {
     getAllDeviceData,
     getMostRecentDeviceData,
     addDeviceData,
-    removeDeviceData
+    removeDeviceData,
+    exportToJson
 };
