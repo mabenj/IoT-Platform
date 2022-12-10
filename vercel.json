@@ -1,8 +1,8 @@
 {
     "rewrites": [
         {
-            "source": "/api/(.*)",
-            "destination": "https://iot-platform.up.railway.app/api"
+            "source": "/api/:match*",
+            "destination": "https://iot-platform.up.railway.app/api/:match*"
         }
     ]
 }
