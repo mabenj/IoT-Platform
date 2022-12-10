@@ -251,7 +251,7 @@ export default function DeviceForm({
                                 <span className="mdi mdi-content-copy"></span>
                             </Button>
                             <Form.Control.Feedback type="invalid">
-                                Provide a valid access token. It must be atleast
+                                Provide a valid access token. It must be at least
                                 8 characters long and contain only letters and
                                 digits.
                             </Form.Control.Feedback>

@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -7,7 +8,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
-import { range, sortAlphabetically, timeSince } from "../utils/utils";
+import { caseInsensitiveSorter, range, timeSince } from "../utils/utils";
 import { DevicesContext } from "./App";
 
 export default function ViewDevices() {
@@ -36,18 +37,22 @@ export default function ViewDevices() {
                         <DevicePlaceholder key={index} />
                     ))}
                 {!isLoading &&
-                    sortAlphabetically(devices, "name").map((device) => (
-                        <DeviceItem
-                            key={device.id}
-                            device={device}
-                            onDeleteDevice={() =>
-                                setDevices &&
-                                setDevices((prev) =>
-                                    prev.filter(({ id }) => id !== device.id)
-                                )
-                            }
-                        />
-                    ))}
+                    devices
+                        .sort(caseInsensitiveSorter("name"))
+                        .map((device) => (
+                            <DeviceItem
+                                key={device.id}
+                                device={device}
+                                onDeleteDevice={() =>
+                                    setDevices &&
+                                    setDevices((prev) =>
+                                        prev.filter(
+                                            ({ id }) => id !== device.id
+                                        )
+                                    )
+                                }
+                            />
+                        ))}
                 {devices.length < 1 && !isLoading && (
                     <Alert variant="warning">
                         No registered devices could be found — Register a new
@@ -84,7 +89,7 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                 to={`/viewDevices/${device.id}`}
                 state={{ device }}
                 title={device.description}>
-                <span className="d-flex justify-content-between">
+                <span className="d-flex justify-content-between align-items-center">
                     <span className="flex-grow-1">
                         <span
                             className="d-inline-block"
@@ -132,13 +137,14 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                     </span>
 
                     <span className="d-inline-block">
-                        <Badge
+                        <Button
+                            variant="danger"
+                            size="sm"
                             className="hover-filter"
-                            bg="danger"
                             onClick={deleteDevice}
                             title="Delete the device">
                             Delete <span className="mdi mdi-delete"></span>
-                        </Badge>
+                        </Button>
                     </span>
                 </span>
             </Link>
