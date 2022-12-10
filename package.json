@@ -8,6 +8,7 @@
     "private": true,
     "scripts": {
         "build": "npx tsc && cd src/client-app/ && yarn install && yarn run build",
+        "build:api": "npx tsc",
         "start": "cross-env NODE_ENV=production node dist/api/app.js",
         "dev:api": "nodemon --ignore src/api/demo src/api/app.ts",
         "dev:client": "cd src/client-app && npm run dev:client",
