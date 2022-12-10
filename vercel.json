@@ -1,17 +1,3 @@
 {
-    "buildCommand": "npx tsc && cd src/client-app/ && yarn install && yarn run build",
-    "outputDirectory": "./dist/client-app",
-    "functions": {
-        "api": {
-            "memory": 1024,
-            "maxDuration": 10,
-            "includeFiles": [".dist/api/**/*"]
-        }
-    },
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "/"
-        }
-    ]
+    "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
 }
