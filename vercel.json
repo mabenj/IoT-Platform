@@ -1,5 +1,4 @@
 {
-    "version": 3,
     "buildCommand": "npx tsc && cd src/client-app/ && yarn install && yarn run build",
     "outputDirectory": "./dist/client-app",
     "functions": {
