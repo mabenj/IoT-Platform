@@ -8,10 +8,10 @@ The UI is a browser based [Create-React-App](https://create-react-app.dev/docs/d
 
 ### Live Demo<!-- omit in toc -->
 
-*Only Web API - no HTTP or CoAP API*
-
 UI: https://iot-platform-demo.vercel.app/
+
 Web API: https://iot-platform.up.railway.app/
+
 HTTP API: https://iot-platform-api.up.railway.app/
 
 # Table of Contents<!-- omit in toc -->
