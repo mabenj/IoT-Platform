@@ -8,6 +8,7 @@ import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
+import { TimeSeriesConfiguration } from "../../../interfaces/time-series-configuration.interface";
 
 const ACCESS_TOKEN_REGEX = "[a-zA-Z0-9]{8,}";
 const ACCESS_TOKEN_ALPHABET =
@@ -33,6 +34,9 @@ export default function DeviceForm({
     const [isAccessTokenVisible, setIsAccessTokenVisible] = useState(false);
     const [validated, setValidated] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [timeSeriesConfigs, setTimeSeriesConfigs] = useState<
+        TimeSeriesConfiguration[]
+    >([]);
     const navigate = useNavigate();
 
     const formRef = useRef<HTMLFormElement>(null);
@@ -251,9 +255,9 @@ export default function DeviceForm({
                                 <span className="mdi mdi-content-copy"></span>
                             </Button>
                             <Form.Control.Feedback type="invalid">
-                                Provide a valid access token. It must be at least
-                                8 characters long and contain only letters and
-                                digits.
+                                Provide a valid access token. It must be at
+                                least 8 characters long and contain only letters
+                                and digits.
                             </Form.Control.Feedback>
                         </InputGroup>
                         <Form.Text muted>
@@ -435,7 +439,8 @@ function extractDevice(form: HTMLFormElement) {
         accessToken: deviceAccessToken.value,
         description: deviceDescription.value,
         enabled: deviceEnabled.checked,
-        protocol: deviceProtocol.value
+        protocol: deviceProtocol.value,
+        timeSeriesConfigurations: []
     };
     return device;
 }
