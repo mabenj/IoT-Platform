@@ -8,6 +8,7 @@ const DeviceSchema: Schema = new Schema(
         enabled: { type: Boolean, required: true },
         protocol: { type: String, required: true },
         description: { type: String },
+        hasTimeSeries: { type: Boolean, required: true, default: false },
         timeSeriesConfigurations: [{ unit: String, valueField: String }]
     },
     {

@@ -6,6 +6,7 @@ export interface Device {
     enabled: boolean;
     protocol: "http" | "coap";
     description: string;
+    hasTimeSeries: boolean;
     timeSeriesConfigurations: TimeSeriesConfiguration[];
     id?: string;
     createdAt?: Date;

@@ -1,5 +1,6 @@
 import { customAlphabet } from "nanoid";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { ListGroup, Table } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
@@ -34,6 +35,7 @@ export default function DeviceForm({
     const [isAccessTokenVisible, setIsAccessTokenVisible] = useState(false);
     const [validated, setValidated] = useState(false);
     const [isRegistering, setIsRegistering] = useState(false);
+    const [hasTimeSeries, setHasTimeSeries] = useState(false);
     const [timeSeriesConfigs, setTimeSeriesConfigs] = useState<
         TimeSeriesConfiguration[]
     >([]);
@@ -59,6 +61,8 @@ export default function DeviceForm({
         }
 
         // clicked 'Register device' or 'Update device'
+
+        // get the last in array
 
         const form = formRef.current;
         setValidated(true);
@@ -106,6 +110,67 @@ export default function DeviceForm({
             result += "●";
         }
         return result;
+    };
+
+    const addTimeSeriesConfig = () => {
+        setTimeSeriesConfigs([
+            ...timeSeriesConfigs,
+            {
+                valueField: "",
+                unit: ""
+            }
+        ]);
+    };
+
+    const removeTimeSeriesConfig = (index: number) => {
+        setTimeSeriesConfigs((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const populateDeviceForm = (
+        device: Device,
+        form: HTMLFormElement | null
+    ) => {
+        if (!form) {
+            return;
+        }
+        const {
+            deviceEnabled,
+            deviceName,
+            deviceDescription,
+            deviceProtocol,
+            deviceAccessToken,
+            deviceHasTimeSeries
+        } = form.elements as any;
+        deviceEnabled.checked = device.enabled;
+        deviceName.value = device.name;
+        deviceDescription.value = device.description;
+        deviceProtocol.value = device.protocol;
+        deviceAccessToken.value = device.accessToken;
+        deviceHasTimeSeries.checked = device.hasTimeSeries;
+
+        setHasTimeSeries(device.hasTimeSeries);
+        setTimeSeriesConfigs(device.timeSeriesConfigurations);
+    };
+
+    const extractDevice = (form: HTMLFormElement) => {
+        const {
+            deviceEnabled,
+            deviceName,
+            deviceDescription,
+            deviceProtocol,
+            deviceAccessToken,
+            deviceHasTimeSeries
+        } = form.elements as any;
+        const device: Device = {
+            name: deviceName.value,
+            accessToken: deviceAccessToken.value,
+            description: deviceDescription.value,
+            enabled: deviceEnabled.checked,
+            protocol: deviceProtocol.value,
+            hasTimeSeries: deviceHasTimeSeries.checked,
+            timeSeriesConfigurations: timeSeriesConfigs
+        };
+        return device;
     };
 
     return (
@@ -160,7 +225,7 @@ export default function DeviceForm({
                     </ValueCol>
                 </Row>
             </Form.Group>
-            <Form.Group className="mb-4" controlId="deviceDescription">
+            <Form.Group className="mb-4" controlId="deviceEnabled">
                 <Row>
                     <LabelCol>
                         <Form.Label>Enabled</Form.Label>
@@ -306,6 +371,145 @@ export default function DeviceForm({
                     </ValueCol>
                 </Row>
             </Form.Group>
+            <Form.Group className="mb-4">
+                <Row>
+                    <LabelCol>
+                        <Form.Label>Time Series</Form.Label>
+                    </LabelCol>
+                    <ValueCol hidden={!isEditing}>
+                        <Form.Check
+                            type="switch"
+                            id="deviceHasTimeSeries"
+                            label=""
+                            disabled={isRegistering}
+                            className="mb-2"
+                            checked={hasTimeSeries}
+                            onChange={() => setHasTimeSeries((prev) => !prev)}
+                        />
+                        {hasTimeSeries && (
+                            <>
+                                <Table size="sm" className="mb-3">
+                                    <thead>
+                                        <tr>
+                                            <th>Value Field</th>
+                                            <th>Unit</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {timeSeriesConfigs.map(
+                                            (config, index) => (
+                                                <tr key={index}>
+                                                    <td>
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder="Value field"
+                                                            required
+                                                            disabled={
+                                                                isRegistering
+                                                            }
+                                                            value={
+                                                                config.valueField
+                                                            }
+                                                            onChange={(e) =>
+                                                                setTimeSeriesConfigs(
+                                                                    (prev) => {
+                                                                        prev[
+                                                                            index
+                                                                        ].valueField =
+                                                                            e.target.value;
+                                                                        return [
+                                                                            ...prev
+                                                                        ];
+                                                                    }
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder="Unit (optional)"
+                                                            disabled={
+                                                                isRegistering
+                                                            }
+                                                            value={config.unit}
+                                                            onChange={(e) =>
+                                                                setTimeSeriesConfigs(
+                                                                    (prev) => {
+                                                                        prev[
+                                                                            index
+                                                                        ].unit =
+                                                                            e.target.value;
+                                                                        return [
+                                                                            ...prev
+                                                                        ];
+                                                                    }
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline-danger"
+                                                            size="sm"
+                                                            title="Delete configuration"
+                                                            onClick={() =>
+                                                                removeTimeSeriesConfig(
+                                                                    index
+                                                                )
+                                                            }>
+                                                            <span className="mdi mdi-delete"></span>
+                                                        </Button>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        )}
+                                    </tbody>
+                                </Table>
+                                <Button
+                                    size="sm"
+                                    variant="secondary"
+                                    className="d-block mb-3"
+                                    onClick={addTimeSeriesConfig}
+                                    disabled={timeSeriesConfigs.some(
+                                        (config) => !config.valueField
+                                    )}>
+                                    <span className="mdi mdi-plus"></span> Add
+                                    Configuration
+                                </Button>
+                                <Form.Text muted>
+                                    Define the time series data
+                                </Form.Text>
+                            </>
+                        )}
+                    </ValueCol>
+                    <ValueCol hidden={isEditing}>
+                        {!hasTimeSeries ? (
+                            "Not defined"
+                        ) : (
+                            <ListGroup>
+                                {timeSeriesConfigs.map((config, index) => (
+                                    <ListGroup.Item key={index}>
+                                        <span title="Value field">
+                                            {config.valueField}
+                                            {config.unit && (
+                                                <small title="Unit">
+                                                    <span className="mx-2">
+                                                        -
+                                                    </span>
+                                                    <em>{config.unit}</em>
+                                                </small>
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        )}
+                    </ValueCol>
+                </Row>
+            </Form.Group>
             <Row>
                 <LabelCol></LabelCol>
                 <ValueCol>
@@ -404,43 +608,3 @@ const Asterisk = ({ isEditing }: AsteriskProps) => {
             style={{ fontSize: "0.5rem" }}></sup>
     );
 };
-
-function populateDeviceForm(
-    initialDevice: Device,
-    form: HTMLFormElement | null
-) {
-    if (!form) {
-        return;
-    }
-    const {
-        deviceEnabled,
-        deviceName,
-        deviceDescription,
-        deviceProtocol,
-        deviceAccessToken
-    } = form.elements as any;
-    deviceEnabled.checked = initialDevice.enabled;
-    deviceName.value = initialDevice.name;
-    deviceDescription.value = initialDevice.description;
-    deviceProtocol.value = initialDevice.protocol;
-    deviceAccessToken.value = initialDevice.accessToken;
-}
-
-function extractDevice(form: HTMLFormElement) {
-    const {
-        deviceEnabled,
-        deviceName,
-        deviceDescription,
-        deviceProtocol,
-        deviceAccessToken
-    } = form.elements as any;
-    const device: Device = {
-        name: deviceName.value,
-        accessToken: deviceAccessToken.value,
-        description: deviceDescription.value,
-        enabled: deviceEnabled.checked,
-        protocol: deviceProtocol.value,
-        timeSeriesConfigurations: []
-    };
-    return device;
-}
