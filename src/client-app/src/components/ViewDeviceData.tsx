@@ -135,7 +135,8 @@ export default function ViewDeviceData() {
                         <span className="mdi mdi-delete"></span> Delete All Data
                     </Button>
                 </div>
-                {device?.hasTimeSeries && false ? (
+                {device?.hasTimeSeries &&
+                device.timeSeriesConfigurations.length > 0 ? (
                     <TimeSeriesGraph
                         deviceData={Array.from(deviceData.values())}
                         timeSeriesConfigs={
@@ -145,13 +146,6 @@ export default function ViewDeviceData() {
                     />
                 ) : (
                     <>
-                        <TimeSeriesGraph
-                            deviceData={Array.from(deviceData.values())}
-                            timeSeriesConfigs={
-                                device?.timeSeriesConfigurations || []
-                            }
-                            loading={isFetchingData}
-                        />
                         <small className="text-muted d-block mt-4">
                             Showing {deviceData.size} out of{" "}
                             {totalDeviceDataCount} entries
@@ -264,6 +258,14 @@ const TimeSeriesGraph = ({
         }
         return format(new Date(timestampMillis), "yyyy-MM-dd");
     };
+
+    if (deviceData.length === 0) {
+        return (
+            <Alert variant="warning" className="my-5">
+                No data available
+            </Alert>
+        );
+    }
 
     if (loading) {
         return (
@@ -519,6 +521,9 @@ const DeviceDataPlaceholder = () => {
 };
 
 function generateHexColor(input: string): string {
+    if (!input) {
+        return "#000000";
+    }
     let hash = 0;
     for (let i = 0; i < input.length; i++) {
         hash = input.charCodeAt(i) + ((hash << 5) - hash);
