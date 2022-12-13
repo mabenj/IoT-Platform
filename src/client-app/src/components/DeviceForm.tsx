@@ -117,6 +117,7 @@ export default function DeviceForm({
             ...timeSeriesConfigs,
             {
                 valueField: "",
+                displayName: "",
                 unit: ""
             }
         ]);
@@ -392,6 +393,7 @@ export default function DeviceForm({
                                     <thead>
                                         <tr>
                                             <th>Value Field</th>
+                                            <th>Display Name</th>
                                             <th>Unit</th>
                                             <th></th>
                                         </tr>
@@ -417,6 +419,31 @@ export default function DeviceForm({
                                                                         prev[
                                                                             index
                                                                         ].valueField =
+                                                                            e.target.value;
+                                                                        return [
+                                                                            ...prev
+                                                                        ];
+                                                                    }
+                                                                )
+                                                            }
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder="Display name (optional)"
+                                                            disabled={
+                                                                isRegistering
+                                                            }
+                                                            value={
+                                                                config.displayName
+                                                            }
+                                                            onChange={(e) =>
+                                                                setTimeSeriesConfigs(
+                                                                    (prev) => {
+                                                                        prev[
+                                                                            index
+                                                                        ].displayName =
                                                                             e.target.value;
                                                                         return [
                                                                             ...prev
@@ -473,14 +500,17 @@ export default function DeviceForm({
                                     variant="secondary"
                                     className="d-block mb-3"
                                     onClick={addTimeSeriesConfig}
-                                    disabled={timeSeriesConfigs.some(
-                                        (config) => !config.valueField
-                                    )}>
+                                    disabled={
+                                        timeSeriesConfigs.length === 2 ||
+                                        timeSeriesConfigs.some(
+                                            (config) => !config.valueField
+                                        )
+                                    }>
                                     <span className="mdi mdi-plus"></span> Add
                                     Configuration
                                 </Button>
                                 <Form.Text muted>
-                                    Define the time series data
+                                    Define the time series data (max 2 fields)
                                 </Form.Text>
                             </>
                         )}
@@ -494,6 +524,16 @@ export default function DeviceForm({
                                     <ListGroup.Item key={index}>
                                         <span title="Value field">
                                             {config.valueField}
+                                            {config.displayName && (
+                                                <small title="Display name">
+                                                    <span className="mx-2">
+                                                        -
+                                                    </span>
+                                                    <em>
+                                                        {config.displayName}
+                                                    </em>
+                                                </small>
+                                            )}
                                             {config.unit && (
                                                 <small title="Unit">
                                                     <span className="mx-2">

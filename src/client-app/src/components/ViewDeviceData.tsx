@@ -200,6 +200,7 @@ const TimeSeriesGraph = ({
 }: TimeSeriesGraphProps) => {
     const [yAxisFields, setYAxisFields] = useState<string[]>([]);
     const [units, setUnits] = useState<string[]>([]);
+    const [displayNames, setDisplayNames] = useState<string[]>([]);
     const [formattedData, setFormattedData] = useState<Record<string, any>[]>(
         []
     );
@@ -210,10 +211,14 @@ const TimeSeriesGraph = ({
             (config) => config.valueField
         );
         const units = timeSeriesConfigs.map(
-            (config, index) => config.unit || config.valueField
+            (config) => config.unit || config.valueField
+        );
+        const displayNames = timeSeriesConfigs.map(
+            (config) => config.displayName || config.valueField
         );
         setYAxisFields(yAxisFields);
         setUnits(units);
+        setDisplayNames(displayNames);
     }, [timeSeriesConfigs]);
 
     useEffect(() => {
@@ -307,7 +312,7 @@ const TimeSeriesGraph = ({
                     <div className="d-flex flex-column gap-2 text-end">
                         <div>
                             <span className="font-monospace fs-5">
-                                {yAxisFields[0]}
+                                {displayNames[0]}
                             </span>
                             <Badge bg="secondary" className="ms-3 fs-6">
                                 {(latestData && latestData[yAxisFields[0]]) +
@@ -317,7 +322,7 @@ const TimeSeriesGraph = ({
                         </div>
                         <div>
                             <span className="font-monospace fs-5">
-                                {yAxisFields[1]}
+                                {displayNames[1]}
                             </span>
                             <Badge bg="secondary" className="ms-3 fs-6">
                                 {(latestData && latestData[yAxisFields[1]]) +
@@ -338,6 +343,7 @@ const TimeSeriesGraph = ({
                                 strokeWidth={1.8}
                                 unit={" " + units[0]}
                                 legendType="plainline"
+                                name={displayNames[0]}
                             />
                             <Line
                                 yAxisId={1}
@@ -347,6 +353,7 @@ const TimeSeriesGraph = ({
                                 strokeWidth={1.8}
                                 unit={" " + units[1]}
                                 legendType="plainline"
+                                name={displayNames[1]}
                             />
 
                             <CartesianGrid
@@ -363,7 +370,7 @@ const TimeSeriesGraph = ({
                             <YAxis
                                 yAxisId={0}
                                 label={{
-                                    value: `${yAxisFields[0]} ${
+                                    value: `${displayNames[0]} ${
                                         units[0] && `(${units[0]})`
                                     }`,
                                     angle: -90,
@@ -374,7 +381,7 @@ const TimeSeriesGraph = ({
                             <YAxis
                                 yAxisId={1}
                                 label={{
-                                    value: `${yAxisFields[1]} ${
+                                    value: `${displayNames[1]} ${
                                         units[1] && `(${units[1]})`
                                     }`,
                                     angle: -90,
@@ -396,30 +403,38 @@ const TimeSeriesGraph = ({
                     <ButtonGroup>
                         <Button
                             variant="primary"
-                            onClick={() => setScale(ALL_TIME_DAYS)}>
+                            onClick={() => setScale(ALL_TIME_DAYS)}
+                            active={scaleInDays === ALL_TIME_DAYS}>
                             All time
                         </Button>
                         <Button
                             variant="primary"
-                            onClick={() => setScale(ONE_YEAR)}>
+                            onClick={() => setScale(ONE_YEAR)}
+                            active={scaleInDays === ONE_YEAR}>
                             1 year
                         </Button>
                         <Button
                             variant="primary"
-                            onClick={() => setScale(SIX_MONTHS)}>
+                            onClick={() => setScale(SIX_MONTHS)}
+                            active={scaleInDays === SIX_MONTHS}>
                             6 months
                         </Button>
                         <Button
                             variant="primary"
-                            onClick={() => setScale(ONE_MONTH)}>
+                            onClick={() => setScale(ONE_MONTH)}
+                            active={scaleInDays === ONE_MONTH}>
                             1 month
                         </Button>
                         <Button
                             variant="primary"
-                            onClick={() => setScale(ONE_WEEK)}>
+                            onClick={() => setScale(ONE_WEEK)}
+                            active={scaleInDays === ONE_WEEK}>
                             1 week
                         </Button>
-                        <Button variant="primary" onClick={() => setScale(1)}>
+                        <Button
+                            variant="primary"
+                            onClick={() => setScale(1)}
+                            active={scaleInDays === 1}>
                             24 hours
                         </Button>
                     </ButtonGroup>

@@ -9,7 +9,7 @@ const DeviceSchema: Schema = new Schema(
         protocol: { type: String, required: true },
         description: { type: String },
         hasTimeSeries: { type: Boolean, required: true, default: false },
-        timeSeriesConfigurations: [{ unit: String, valueField: String }]
+        timeSeriesConfigurations: [{ unit: String, valueField: String, displayName: String }]
     },
     {
         timestamps: true,
