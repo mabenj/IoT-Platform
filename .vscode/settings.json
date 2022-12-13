@@ -8,5 +8,12 @@
     "prettier.tabWidth": 4,
     "editor.bracketPairColorization.enabled": true,
     "editor.guides.bracketPairs": "active",
-    "cSpell.words": ["Coap", "Sidenav", "viewdata", "virtuals"]
+    "cSpell.words": [
+        "Coap",
+        "Millis",
+        "plainline",
+        "Sidenav",
+        "viewdata",
+        "virtuals"
+    ]
 }
