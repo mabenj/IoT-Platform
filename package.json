@@ -8,7 +8,7 @@
     "private": true,
     "scripts": {
         "build": "tsc",
-        "build:client": "mkdir dist && rm -rf dist/client-app && cd src/client-app && yarn install &&  yarn run build && mv build ../../dist/client-app",
+        "build:client": "mkdirp dist && rm -rf dist/client-app && cd src/client-app && yarn install &&  yarn run build && mv build ../../dist/client-app && cd ../.. && node postBuild.js",
         "start": "cross-env NODE_ENV=production node dist/api/app.js",
         "dev:api": "nodemon --ignore src/api/demo src/api/app.ts",
         "dev:client": "cd src/client-app && npm run dev:client",
@@ -31,6 +31,7 @@
         "@types/express": "^4.17.13",
         "@types/mongoose": "^5.11.97",
         "@types/node": "^17.0.25",
+        "mkdirp": "^1.0.4",
         "nodemon": "^2.0.15",
         "ts-node": "^10.7.0",
         "typescript": "^4.6.3"
