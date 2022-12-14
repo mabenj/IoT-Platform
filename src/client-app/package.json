@@ -29,7 +29,7 @@
     },
     "scripts": {
         "dev:client": "react-scripts start",
-        "build": "react-scripts build && rm -rf ../../dist/client-app && mv build ../../dist/client-app",
+        "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
     },
