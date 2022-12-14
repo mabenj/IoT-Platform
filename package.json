@@ -8,7 +8,7 @@
     "private": true,
     "scripts": {
         "build": "tsc",
-        "build:client": "rm -rf dist/client-app && cd src/client-app && yarn install &&  yarn run build && mv build ../../dist/client-app",
+        "build:client": "mkdir dist && rm -rf dist/client-app && cd src/client-app && yarn install &&  yarn run build && mv build ../../dist/client-app",
         "start": "cross-env NODE_ENV=production node dist/api/app.js",
         "dev:api": "nodemon --ignore src/api/demo src/api/app.ts",
         "dev:client": "cd src/client-app && npm run dev:client",
