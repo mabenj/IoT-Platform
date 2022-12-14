@@ -3,7 +3,7 @@ if (apiRedirect) {
     const fs = require("fs");
     fs.writeFile(
         "dist/client-app/_redirects",
-        `/api/* ${apiRedirect}/:splat`,
+        `/api/* ${apiRedirect}/:splat 200`,
         () => null
     );
 }
