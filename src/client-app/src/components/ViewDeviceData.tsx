@@ -222,7 +222,7 @@ const TimeSeriesGraph = ({
                     timeStamp: createdAt.getTime()
                 };
                 yAxisFields.forEach(
-                    (field) => (formatted[field] = data[field])
+                    (field) => (formatted[field] = +data[field])
                 );
                 return formatted;
             })
@@ -259,19 +259,19 @@ const TimeSeriesGraph = ({
         return format(new Date(timestampMillis), "yyyy-MM-dd");
     };
 
+    if (loading) {
+        return (
+            <div className="w-100 d-flex justify-content-center my-6 mt-5">
+                <Spinner variant="primary" />
+            </div>
+        );
+    }
+
     if (deviceData.length === 0) {
         return (
             <Alert variant="warning" className="my-5">
                 No data available
             </Alert>
-        );
-    }
-
-    if (loading) {
-        return (
-            <div className="w-100 d-flex justify-content-center my-6">
-                <Spinner variant="primary" />
-            </div>
         );
     }
 
@@ -339,7 +339,7 @@ const TimeSeriesGraph = ({
                         <LineChart data={formattedData} margin={{ bottom: 80 }}>
                             <Line
                                 yAxisId={0}
-                                type="monotone"
+                                type="linear"
                                 dataKey={yAxisFields[0]}
                                 stroke={generateHexColor(yAxisFields[0])}
                                 strokeWidth={1.8}
@@ -349,7 +349,7 @@ const TimeSeriesGraph = ({
                             />
                             <Line
                                 yAxisId={1}
-                                type="monotone"
+                                type="linear"
                                 dataKey={yAxisFields[1]}
                                 stroke={generateHexColor(yAxisFields[1])}
                                 strokeWidth={1.8}
@@ -365,7 +365,6 @@ const TimeSeriesGraph = ({
                             <XAxis
                                 dataKey="timeStamp"
                                 angle={-10}
-                                interval={0}
                                 tickFormatter={(val) => formatTimestamp(val)}
                                 tick={<CustomTick />}
                             />
