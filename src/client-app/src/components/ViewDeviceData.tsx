@@ -108,6 +108,29 @@ export default function ViewDeviceData() {
         setTotalDeviceDataCount(0);
     };
 
+    const refreshData = async () => {
+        if (!device?.id) {
+            return;
+        }
+        setIsFetchingData(true);
+        const { deviceData: newDeviceData, count } =
+            await DeviceDataService.getDeviceData(
+                device.id,
+                chunkIndexes[0],
+                chunkIndexes[1]
+            );
+        setDeviceData((prev) => {
+            newDeviceData.forEach((data) => prev.set(data.id, data));
+            return prev;
+        });
+        setChunkIndexes((prev) => [
+            Math.min(prev[0] + CHUNK_SIZE + 1, count),
+            Math.min(prev[1] + CHUNK_SIZE + 1, count)
+        ]);
+        setTotalDeviceDataCount(count);
+        setIsFetchingData(false);
+    };
+
     return (
         <div>
             <h2>Device Data - {device?.name}</h2>
@@ -123,6 +146,12 @@ export default function ViewDeviceData() {
                         />
                     )}
                 <div className="mt-4 d-flex gap-2">
+                    <Button
+                        title="Refresh data"
+                        onClick={() => refreshData()}
+                        disabled={deviceData.size < 1 || isExporting}>
+                        <span className="mdi mdi-reload"></span> Refresh data
+                    </Button>
                     <Button
                         title="Export all device data as JSON"
                         disabled={deviceData.size < 1 || isExporting}
