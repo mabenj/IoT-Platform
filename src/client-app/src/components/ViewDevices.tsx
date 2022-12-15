@@ -103,7 +103,7 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
     );
 
     return (
-        <ListGroup.Item action>
+        <ListGroup.Item action style={{ cursor: "unset" }}>
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
                 <Link
                     to={`/viewDevices/${device.id}`}
