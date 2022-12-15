@@ -1,12 +1,12 @@
 import { Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
 
-interface SidenavProps {
+interface SidebarProps {
     isExpanded: boolean;
     toggleExpanded: () => any;
 }
 
-export default function Sidenav({ isExpanded, toggleExpanded }: SidenavProps) {
+export default function Sidebar({ isExpanded, toggleExpanded }: SidebarProps) {
     return (
         <div className={`iot-sidebar ${isExpanded && "iot-sidebar-expanded"}`}>
             <div className="w-full d-flex justify-content-end m-1">

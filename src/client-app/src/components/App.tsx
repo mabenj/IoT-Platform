@@ -11,7 +11,7 @@ import useLocalStorage from "../hooks/useLocalStorage";
 import ClientRoutes from "../routes/routes";
 import DeviceService from "../services/DeviceService";
 import Breadcrumb from "./Breadcrumb";
-import Sidenav from "./Sidenav";
+import Sidebar from "./Sidebar";
 
 const SIDEBAR_STATE_KEY = "iot.sidebar.expanded;";
 
@@ -39,7 +39,7 @@ function App() {
 
     return (
         <Router>
-            <Sidenav
+            <Sidebar
                 isExpanded={sidebarExpanded}
                 toggleExpanded={() => setSidebarExpanded((prev) => !prev)}
             />
