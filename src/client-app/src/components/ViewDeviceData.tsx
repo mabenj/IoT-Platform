@@ -506,7 +506,7 @@ const TimeSeriesGraph = ({
                 <div className="w-100 h-100 mt-2 d-flex justify-content-center">
                     {isMobile ? (
                         <Button onClick={() => setShowAsModal(true)}>
-                            Show graph
+                            <span className="mdi mdi-launch"></span> Show graph
                         </Button>
                     ) : (
                         <Chart />
