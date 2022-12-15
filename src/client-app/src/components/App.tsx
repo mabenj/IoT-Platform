@@ -7,10 +7,13 @@ import {
 } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import { useIsMobile } from "../hooks/useIsMobile";
+import useLocalStorage from "../hooks/useLocalStorage";
 import ClientRoutes from "../routes/routes";
 import DeviceService from "../services/DeviceService";
 import Breadcrumb from "./Breadcrumb";
 import Sidenav from "./Sidenav";
+
+const SIDEBAR_STATE_KEY = "iot.sidebar.expanded;";
 
 interface IDevicesContext {
     devices: Device[];
@@ -20,9 +23,12 @@ interface IDevicesContext {
 export const DevicesContext = React.createContext<IDevicesContext | null>(null);
 
 function App() {
-    const isMobile = useIsMobile();
     const [devices, setDevices] = useState<Device[]>([]);
-    const [sidebarExpanded, setSidebarExpanded] = useState(!isMobile);
+    const isMobile = useIsMobile();
+    const [sidebarExpanded, setSidebarExpanded] = useLocalStorage(
+        SIDEBAR_STATE_KEY,
+        !isMobile
+    );
 
     useEffect(() => {
         async function fetchDevices() {
