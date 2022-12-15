@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
 import {
     BrowserRouter as Router,
     Outlet,
@@ -22,6 +20,7 @@ export const DevicesContext = React.createContext<IDevicesContext | null>(null);
 
 function App() {
     const [devices, setDevices] = useState<Device[]>([]);
+    const [sidebarExpanded, setSidebarExpanded] = useState(false); // TODO: set this depending on mobile
 
     useEffect(() => {
         async function fetchDevices() {
@@ -32,17 +31,18 @@ function App() {
 
     return (
         <Router>
-            <Container fluid>
-                <Row className="mt-5">
-                    <Sidenav className="sidenav" />
-                    <main className="main-content">
-                        <DevicesContext.Provider
-                            value={{ devices, setDevices }}>
-                            <MainContent />
-                        </DevicesContext.Provider>
-                    </main>
-                </Row>
-            </Container>
+            <Sidenav
+                isExpanded={sidebarExpanded}
+                toggleExpanded={() => setSidebarExpanded((prev) => !prev)}
+            />
+            <main
+                className={`iot-main-content ${
+                    sidebarExpanded && "iot-main-content-padded"
+                }`}>
+                <DevicesContext.Provider value={{ devices, setDevices }}>
+                    <MainContent />
+                </DevicesContext.Provider>
+            </main>
         </Router>
     );
 }

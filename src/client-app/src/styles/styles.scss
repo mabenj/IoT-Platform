@@ -1,0 +1,170 @@
+$sm: 576px;
+$md: 768px;
+$lg: 992px;
+$xl: 1200px;
+$xxl: 1400px;
+
+$sidebar-width: 60px;
+$sidebar-width-expanded: 200px;
+
+$bs-blue: #0d6efd;
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+        "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+        monospace;
+}
+
+a {
+    text-decoration: none;
+}
+
+.iot-sidebar {
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    overflow-x: hidden;
+    border-right: 1px solid rgba(0, 0, 0, 0.123);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.308);
+    background-color: rgb(223, 223, 223);
+    width: $sidebar-width;
+    transition: width 200ms;
+
+    &.iot-sidebar-expanded {
+        width: $sidebar-width-expanded;
+    }
+
+    .iot-sidebar-btn {
+        background-color: transparent;
+        border: none;
+        color: black;
+
+        &:hover {
+            background-color: lightgray;
+            color: $bs-blue;
+        }
+    }
+
+    .list-group-item {
+        background-color: transparent;
+
+        &.active {
+            background-color: lightgray;
+            border-color: rgb(196, 196, 196);
+        }
+
+        &:hover {
+            background-color: lightgray;
+        }
+
+        a {
+            color: black;
+
+            &:hover {
+                background-color: lightgray;
+                color: $bs-blue;
+            }
+        }
+    }
+
+    .iot-sidebar-label {
+        white-space: nowrap;
+        margin-left: 1.3rem;
+        display: none;
+
+        &.iot-sidebar-label-expanded {
+            display: inline;
+        }
+    }
+}
+
+.iot-main-content {
+    padding: 1rem;
+    margin-left: $sidebar-width;
+    transition: margin-left 200ms;
+
+    &.iot-main-content-padded {
+        @media (min-width: $sm) {
+            margin-left: $sidebar-width-expanded;
+        }
+    }
+
+    @media (min-width: $lg) {
+        padding: 2rem 6rem;
+    }
+}
+
+.iot-time-series-latest-value {
+    display: grid;
+    grid-template-areas:
+        "title"
+        "timestamp"
+        "value1"
+        "value2";
+    justify-items: center;
+
+    @media (min-width: $lg) {
+        padding-left: 3.5rem;
+        padding-right: 3.5rem;
+    }
+
+    .iot-time-series-title {
+        grid-area: title;
+    }
+
+    .iot-time-series-timestamp {
+        grid-area: timestamp;
+    }
+
+    .iot-time-series-value1 {
+        grid-area: value1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        line-height: 1;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .iot-time-series-value2 {
+        grid-area: value2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        line-height: 1;
+        margin-bottom: 1.5rem;
+    }
+}
+
+.hover-underline:hover {
+    text-decoration: underline;
+}
+
+.hover-filter:hover {
+    filter: brightness(110%);
+}
+
+.overflow-y-scroll {
+    overflow-y: scroll;
+}
+
+.height-100 {
+    height: 100%;
+}
+
+.fixed {
+    position: fixed;
+}

@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { Badge, ButtonGroup } from "react-bootstrap";
+import { Badge, ButtonGroup, Modal } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -23,8 +23,9 @@ import {
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
 import { TimeSeriesConfiguration } from "../../../interfaces/time-series-configuration.interface";
+import { useIsMobile } from "../hooks/useIsMobile";
 import DeviceDataService from "../services/DeviceDataService";
-import { range, timeSince } from "../utils/utils";
+import { generateHexColor, range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
 
 const CHUNK_SIZE = 200;
@@ -110,12 +111,21 @@ export default function ViewDeviceData() {
     return (
         <div>
             <h2>Device Data - {device?.name}</h2>
-            <Col sm={8}>
-                <div className="mt-4">
+            <Col xl={10} xxl={8}>
+                {device?.hasTimeSeries &&
+                    device.timeSeriesConfigurations.length > 0 && (
+                        <TimeSeriesGraph
+                            deviceData={Array.from(deviceData.values())}
+                            timeSeriesConfigs={
+                                device?.timeSeriesConfigurations || []
+                            }
+                            loading={isFetchingData}
+                        />
+                    )}
+                <div className="mt-4 d-flex gap-2">
                     <Button
                         title="Export all device data as JSON"
                         disabled={deviceData.size < 1 || isExporting}
-                        className="me-3"
                         onClick={() => exportData()}>
                         {isExporting ? (
                             <Spinner
@@ -135,46 +145,31 @@ export default function ViewDeviceData() {
                         <span className="mdi mdi-delete"></span> Delete All Data
                     </Button>
                 </div>
-                {device?.hasTimeSeries &&
-                device.timeSeriesConfigurations.length > 0 ? (
-                    <TimeSeriesGraph
-                        deviceData={Array.from(deviceData.values())}
-                        timeSeriesConfigs={
-                            device?.timeSeriesConfigurations || []
-                        }
-                        loading={isFetchingData}
-                    />
-                ) : (
-                    <>
-                        <small className="text-muted d-block mt-4">
-                            Showing {deviceData.size} out of{" "}
-                            {totalDeviceDataCount} entries
-                        </small>
-                        {!isFetchingData &&
-                            Array.from(deviceData.values()).map((data) => (
-                                <DeviceDataCard key={data.id} data={data} />
-                            ))}
-                        {isFetchingData &&
-                            range(0, 10).map((index) => (
-                                <>
-                                    <DeviceDataPlaceholder key={index} />
-                                    <br />
-                                </>
-                            ))}
-                        {!isFetchingData && deviceData.size === 0 && (
-                            <Alert variant="warning" className="mt-5">
-                                No device data exists for device '
-                                <strong>{device?.name}</strong>'
-                            </Alert>
-                        )}
-                        {!isFetchingData &&
-                            totalDeviceDataCount > deviceData.size && (
-                                <Alert variant="warning" className="mt-5">
-                                    Only the first {deviceData.size} entries are
-                                    shown
-                                </Alert>
-                            )}
-                    </>
+                <small className="text-muted d-block mt-4">
+                    Showing {deviceData.size} out of {totalDeviceDataCount}{" "}
+                    entries
+                </small>
+                {!isFetchingData &&
+                    Array.from(deviceData.values()).map((data) => (
+                        <DeviceDataCard key={data.id} data={data} />
+                    ))}
+                {isFetchingData &&
+                    range(0, 10).map((index) => (
+                        <>
+                            <DeviceDataPlaceholder key={index} />
+                            <br />
+                        </>
+                    ))}
+                {!isFetchingData && deviceData.size === 0 && (
+                    <Alert variant="warning" className="mt-5">
+                        No device data exists for device '
+                        <strong>{device?.name}</strong>'
+                    </Alert>
+                )}
+                {!isFetchingData && totalDeviceDataCount > deviceData.size && (
+                    <Alert variant="warning" className="mt-5">
+                        Only the first {deviceData.size} entries are shown
+                    </Alert>
                 )}
             </Col>
         </div>
@@ -192,6 +187,8 @@ const TimeSeriesGraph = ({
     timeSeriesConfigs,
     loading
 }: TimeSeriesGraphProps) => {
+    const [showAsModal, setShowAsModal] = useState(false);
+    const isMobile = useIsMobile();
     const [yAxisFields, setYAxisFields] = useState<string[]>([]);
     const [units, setUnits] = useState<string[]>([]);
     const [displayNames, setDisplayNames] = useState<string[]>([]);
@@ -295,37 +292,149 @@ const TimeSeriesGraph = ({
         );
     };
 
+    const Chart = () => (
+        <ResponsiveContainer width="100%" height={500} minWidth={500}>
+            <LineChart data={formattedData} margin={{ bottom: 80 }}>
+                <Line
+                    yAxisId={0}
+                    type="linear"
+                    dataKey={yAxisFields[0]}
+                    stroke={generateHexColor(yAxisFields[0])}
+                    strokeWidth={1.8}
+                    unit={" " + units[0]}
+                    legendType="plainline"
+                    name={displayNames[0]}
+                    dot={false}
+                />
+                <Line
+                    yAxisId={1}
+                    type="linear"
+                    dataKey={yAxisFields[1]}
+                    stroke={generateHexColor(yAxisFields[1])}
+                    strokeWidth={1.8}
+                    unit={" " + units[1]}
+                    legendType="plainline"
+                    name={displayNames[1]}
+                    dot={false}
+                />
+
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                <XAxis
+                    dataKey="timeStamp"
+                    angle={-10}
+                    tickFormatter={(val) => formatTimestamp(val)}
+                    tick={<CustomTick />}
+                />
+                <YAxis
+                    yAxisId={0}
+                    label={{
+                        value: `${displayNames[0]} ${
+                            units[0] && `(${units[0]})`
+                        }`,
+                        angle: -90,
+                        position: "insideLeft",
+                        offset: 15
+                    }}
+                />
+                <YAxis
+                    yAxisId={1}
+                    label={{
+                        value: `${displayNames[1]} ${
+                            units[1] && `(${units[1]})`
+                        }`,
+                        angle: -90,
+                        position: "right",
+                        offset: -15
+                    }}
+                    orientation="right"
+                />
+                <Tooltip
+                    labelFormatter={(value) => formatTimestamp(value, true)}
+                />
+                <Legend verticalAlign="top" />
+            </LineChart>
+        </ResponsiveContainer>
+    );
+
+    const ScaleButtons = () => (
+        <div className="w-100 d-flex justify-content-center my-3">
+            <ButtonGroup vertical={isMobile}>
+                <Button
+                    disabled
+                    variant="primary"
+                    onClick={() => setScale(ALL_TIME_DAYS)}
+                    active={scaleInDays === ALL_TIME_DAYS}>
+                    All time
+                </Button>
+                <Button
+                    disabled
+                    variant="primary"
+                    onClick={() => setScale(ONE_YEAR)}
+                    active={scaleInDays === ONE_YEAR}>
+                    1 year
+                </Button>
+                <Button
+                    disabled
+                    variant="primary"
+                    onClick={() => setScale(SIX_MONTHS)}
+                    active={scaleInDays === SIX_MONTHS}>
+                    6 months
+                </Button>
+                <Button
+                    disabled
+                    variant="primary"
+                    onClick={() => setScale(ONE_MONTH)}
+                    active={scaleInDays === ONE_MONTH}>
+                    1 month
+                </Button>
+                <Button
+                    disabled
+                    variant="primary"
+                    onClick={() => setScale(ONE_WEEK)}
+                    active={scaleInDays === ONE_WEEK}>
+                    1 week
+                </Button>
+                <Button
+                    variant="primary"
+                    onClick={() => setScale(1)}
+                    active={scaleInDays === 1}>
+                    24 hours
+                </Button>
+            </ButtonGroup>
+        </div>
+    );
+
     return (
         <Card className="my-5">
             <Card.Header>Time Series</Card.Header>
             <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mx-5">
-                    <div>
-                        <Card.Title>
-                            <div className="d-flex align-items-center gap-2">
-                                Latest Value
-                            </div>
-                        </Card.Title>
-                        <Card.Subtitle className="text-muted">
-                            {latestData &&
-                                formatTimestamp(latestData["timeStamp"], true)}
-                        </Card.Subtitle>
-                    </div>
-                    <div className="d-flex flex-column gap-2 text-end">
+                <div className="iot-time-series-latest-value">
+                    <Card.Title>
+                        <div className="iot-time-series-title">
+                            Latest Value
+                        </div>
+                    </Card.Title>
+                    <Card.Subtitle className="iot-time-series-timestamp">
+                        {latestData &&
+                            formatTimestamp(latestData["timeStamp"], true)}
+                    </Card.Subtitle>
+                    <div className="iot-time-series-value1">
+                        <span className="font-monospace fs-5">
+                            {displayNames[0]}
+                        </span>
                         <div>
-                            <span className="font-monospace fs-5">
-                                {displayNames[0]}
-                            </span>
                             <Badge bg="secondary" className="ms-3 fs-6">
                                 {(latestData && latestData[yAxisFields[0]]) +
                                     " " +
                                     units[0]}
                             </Badge>
                         </div>
+                    </div>
+                    <div className="iot-time-series-value2">
+                        <span className="font-monospace fs-5">
+                            {displayNames[1]}
+                        </span>
                         <div>
-                            <span className="font-monospace fs-5">
-                                {displayNames[1]}
-                            </span>
                             <Badge bg="secondary" className="ms-3 fs-6">
                                 {(latestData && latestData[yAxisFields[1]]) +
                                     " " +
@@ -334,112 +443,28 @@ const TimeSeriesGraph = ({
                         </div>
                     </div>
                 </div>
-                <div className="w-100 h-100 mt-2">
-                    <ResponsiveContainer width="100%" height={500}>
-                        <LineChart data={formattedData} margin={{ bottom: 80 }}>
-                            <Line
-                                yAxisId={0}
-                                type="linear"
-                                dataKey={yAxisFields[0]}
-                                stroke={generateHexColor(yAxisFields[0])}
-                                strokeWidth={1.8}
-                                unit={" " + units[0]}
-                                legendType="plainline"
-                                name={displayNames[0]}
-                            />
-                            <Line
-                                yAxisId={1}
-                                type="linear"
-                                dataKey={yAxisFields[1]}
-                                stroke={generateHexColor(yAxisFields[1])}
-                                strokeWidth={1.8}
-                                unit={" " + units[1]}
-                                legendType="plainline"
-                                name={displayNames[1]}
-                            />
-
-                            <CartesianGrid
-                                stroke="#ccc"
-                                strokeDasharray="5 5"
-                            />
-                            <XAxis
-                                dataKey="timeStamp"
-                                angle={-10}
-                                tickFormatter={(val) => formatTimestamp(val)}
-                                tick={<CustomTick />}
-                            />
-                            <YAxis
-                                yAxisId={0}
-                                label={{
-                                    value: `${displayNames[0]} ${
-                                        units[0] && `(${units[0]})`
-                                    }`,
-                                    angle: -90,
-                                    position: "insideLeft",
-                                    offset: 15
-                                }}
-                            />
-                            <YAxis
-                                yAxisId={1}
-                                label={{
-                                    value: `${displayNames[1]} ${
-                                        units[1] && `(${units[1]})`
-                                    }`,
-                                    angle: -90,
-                                    position: "right",
-                                    offset: -15
-                                }}
-                                orientation="right"
-                            />
-                            <Tooltip
-                                labelFormatter={(value) =>
-                                    formatTimestamp(value, true)
-                                }
-                            />
-                            <Legend verticalAlign="top" />
-                        </LineChart>
-                    </ResponsiveContainer>
+                <div className="w-100 h-100 mt-2 d-flex justify-content-center">
+                    {isMobile ? (
+                        <Button onClick={() => setShowAsModal(true)}>
+                            Show graph
+                        </Button>
+                    ) : (
+                        <Chart />
+                    )}
+                    <Modal
+                        show={showAsModal}
+                        fullscreen="md-down"
+                        onHide={() => setShowAsModal(false)}>
+                        <Modal.Header closeButton>
+                            Time Series Graph
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Chart />
+                            <ScaleButtons />
+                        </Modal.Body>
+                    </Modal>
                 </div>
-                <div className="w-100 d-flex justify-content-center my-3">
-                    <ButtonGroup>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(ALL_TIME_DAYS)}
-                            active={scaleInDays === ALL_TIME_DAYS}>
-                            All time
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(ONE_YEAR)}
-                            active={scaleInDays === ONE_YEAR}>
-                            1 year
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(SIX_MONTHS)}
-                            active={scaleInDays === SIX_MONTHS}>
-                            6 months
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(ONE_MONTH)}
-                            active={scaleInDays === ONE_MONTH}>
-                            1 month
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(ONE_WEEK)}
-                            active={scaleInDays === ONE_WEEK}>
-                            1 week
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => setScale(1)}
-                            active={scaleInDays === 1}>
-                            24 hours
-                        </Button>
-                    </ButtonGroup>
-                </div>
+                {!isMobile && <ScaleButtons />}
             </Card.Body>
         </Card>
     );
@@ -456,7 +481,9 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
         <Card className="my-4 shadow-sm">
             <Card.Body>
                 <span className="d-flex justify-content-between">
-                    <Card.Title>{data.createdAt.toLocaleString()}</Card.Title>
+                    <Card.Title>
+                        {format(data.createdAt, "yyyy-MM-dd HH:mm:ss")}
+                    </Card.Title>
                     <Button
                         variant=""
                         as="span"
@@ -478,7 +505,7 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
                 </Collapse>
             </Card.Body>
             <Card.Footer className="text-muted">
-                {timeSince(data.createdAt)} ago
+                {timeAgo(data.createdAt)} ago
             </Card.Footer>
         </Card>
     );
@@ -518,19 +545,3 @@ const DeviceDataPlaceholder = () => {
         </Card>
     );
 };
-
-function generateHexColor(input: string): string {
-    if (!input) {
-        return "#000000";
-    }
-    let hash = 0;
-    for (let i = 0; i < input.length; i++) {
-        hash = input.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    let color = "#";
-    for (var i = 0; i < 3; i++) {
-        const value = (hash >> (i * 8)) & 0xff;
-        color += ("00" + value.toString(16)).substr(-2);
-    }
-    return color;
-}

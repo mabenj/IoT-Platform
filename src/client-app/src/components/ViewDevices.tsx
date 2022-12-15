@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
-import Badge from "react-bootstrap/Badge";
 import ListGroup from "react-bootstrap/ListGroup";
 import Placeholder from "react-bootstrap/Placeholder";
 import Spinner from "react-bootstrap/Spinner";
 import { Link } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
-import { caseInsensitiveSorter, range, timeSince } from "../utils/utils";
+import { caseInsensitiveSorter, range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
 
 export default function ViewDevices() {
@@ -88,55 +87,41 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
             <Link
                 to={`/viewDevices/${device.id}`}
                 state={{ device }}
-                title={device.description}>
-                <span className="d-flex justify-content-between align-items-center">
-                    <span className="flex-grow-1">
-                        <span
-                            className="d-inline-block"
-                            style={{ width: "5%", minWidth: "80px" }}>
-                            <Badge
-                                pill
-                                bg={device.enabled ? "success" : "secondary"}
-                                className="me-3">
-                                {device.enabled ? "Enabled" : "Disabled"}
-                            </Badge>
+                title={`Description: ${device.description || "empty"}`}>
+                <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div className="flex-grow-1">
+                        <span className="hover-underline me-2">
+                            {device.name}
                         </span>
-                        <span
-                            className="d-inline-block"
-                            style={{ width: "5%", minWidth: "80px" }}>
-                            <Badge
-                                bg={
-                                    device.protocol === "http"
-                                        ? "primary"
-                                        : "info"
-                                }
-                                pill>
-                                {device.protocol === "http"
-                                    ? "HTTP"
-                                    : device.protocol === "coap"
-                                    ? "CoAP"
-                                    : "Unknown"}
-                            </Badge>
-                        </span>
-                        <span
-                            className="d-inline-block"
-                            style={{ width: "20%", minWidth: "80px" }}>
-                            <span className="hover-underline">
-                                {device.name}
-                            </span>
-                        </span>
-                        <span className="d-inline-block">
-                            <small className="text-decoration-none text-muted pe-none">
-                                <em>
-                                    Modified{" "}
-                                    {timeSince(device.updatedAt || new Date())}{" "}
-                                    ago
-                                </em>
-                            </small>
-                        </span>
-                    </span>
-
-                    <span className="d-inline-block">
+                        <small className="text-decoration-none text-muted pe-none">
+                            <em>
+                                Modified{" "}
+                                {timeAgo(device.updatedAt || new Date())}
+                            </em>
+                        </small>
+                    </div>
+                    <div className="d-flex gap-5">
+                        <div className="d-flex gap-2">
+                            <div>
+                                <Badge
+                                    pill
+                                    bg={
+                                        device.enabled ? "success" : "secondary"
+                                    }
+                                    className="">
+                                    {device.enabled ? "Enabled" : "Disabled"}
+                                </Badge>
+                            </div>
+                            <div>
+                                <Badge bg="primary" pill className="">
+                                    {device.protocol === "http"
+                                        ? "HTTP"
+                                        : device.protocol === "coap"
+                                        ? "CoAP"
+                                        : "Unknown"}
+                                </Badge>
+                            </div>
+                        </div>
                         <Button
                             variant="danger"
                             size="sm"
@@ -145,8 +130,8 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                             title="Delete the device">
                             Delete <span className="mdi mdi-delete"></span>
                         </Button>
-                    </span>
-                </span>
+                    </div>
+                </div>
             </Link>
         </ListGroup.Item>
     );

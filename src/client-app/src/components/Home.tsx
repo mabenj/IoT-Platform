@@ -11,7 +11,7 @@ export default function Home() {
     return (
         <>
             <h1>IoT Platform</h1>
-            <div className="d-flex mt-4 gap-4">
+            <div className="d-flex flex-wrap mt-4 gap-4">
                 <NavigationPane
                     label="View Devices"
                     linkTo="/viewDevices"
