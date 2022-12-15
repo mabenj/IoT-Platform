@@ -267,7 +267,7 @@ const TimeSeriesGraph = ({
     if (deviceData.length === 0) {
         return (
             <Alert variant="warning" className="my-5">
-                No data available
+                No time series data available
             </Alert>
         );
     }

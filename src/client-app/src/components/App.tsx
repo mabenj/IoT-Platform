@@ -6,6 +6,7 @@ import {
     Routes
 } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
+import { useIsMobile } from "../hooks/useIsMobile";
 import ClientRoutes from "../routes/routes";
 import DeviceService from "../services/DeviceService";
 import Breadcrumb from "./Breadcrumb";
@@ -19,8 +20,9 @@ interface IDevicesContext {
 export const DevicesContext = React.createContext<IDevicesContext | null>(null);
 
 function App() {
+    const isMobile = useIsMobile();
     const [devices, setDevices] = useState<Device[]>([]);
-    const [sidebarExpanded, setSidebarExpanded] = useState(false); // TODO: set this depending on mobile
+    const [sidebarExpanded, setSidebarExpanded] = useState(!isMobile);
 
     useEffect(() => {
         async function fetchDevices() {
