@@ -9,6 +9,7 @@ import { Device } from "../../../interfaces/device.interface";
 import DeviceService from "../services/DeviceService";
 import { caseInsensitiveSorter, range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
+import HoverTooltip from "./ui/HoverTooltip";
 
 export default function ViewDevices() {
     const { devices, setDevices } = useContext(DevicesContext) || {
@@ -105,14 +106,18 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
     return (
         <ListGroup.Item action style={{ cursor: "unset" }}>
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                <Link
-                    to={`/viewDevices/${device.id}`}
-                    state={{ device }}
-                    title={`Description: ${device.description || "empty"}`}>
+                <Link to={`/viewDevices/${device.id}`} state={{ device }}>
                     <div className="flex-grow-1">
-                        <span className="hover-underline me-2">
-                            {device.name}
-                        </span>
+                        <HoverTooltip
+                            tooltip={
+                                device.description
+                                    ? `Description: ${device.description}`
+                                    : undefined
+                            }>
+                            <span className="hover-underline me-2">
+                                {device.name}
+                            </span>
+                        </HoverTooltip>
                         <small className="text-decoration-none text-muted pe-none">
                             <em>
                                 Modified{" "}
@@ -124,21 +129,27 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                 <div className="d-flex gap-5">
                     <div className="d-flex gap-2">
                         <div>
-                            <Badge
-                                pill
-                                bg={device.enabled ? "success" : "secondary"}
-                                className="">
-                                {device.enabled ? "Enabled" : "Disabled"}
-                            </Badge>
+                            <HoverTooltip tooltip="Device state">
+                                <Badge
+                                    pill
+                                    bg={
+                                        device.enabled ? "success" : "secondary"
+                                    }
+                                    className="">
+                                    {device.enabled ? "Enabled" : "Disabled"}
+                                </Badge>
+                            </HoverTooltip>
                         </div>
                         <div>
-                            <Badge bg="primary" pill className="">
-                                {device.protocol === "http"
-                                    ? "HTTP"
-                                    : device.protocol === "coap"
-                                    ? "CoAP"
-                                    : "Unknown"}
-                            </Badge>
+                            <HoverTooltip tooltip="Used protocol">
+                                <Badge bg="primary" pill className="">
+                                    {device.protocol === "http"
+                                        ? "HTTP"
+                                        : device.protocol === "coap"
+                                        ? "CoAP"
+                                        : "Unknown"}
+                                </Badge>
+                            </HoverTooltip>
                         </div>
                     </div>
                     <OverlayTrigger
@@ -148,8 +159,7 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                         <Button
                             variant="danger"
                             size="sm"
-                            className="hover-filter"
-                            title="Delete the device">
+                            className="hover-filter">
                             Delete <span className="mdi mdi-delete"></span>
                         </Button>
                     </OverlayTrigger>

@@ -1,5 +1,6 @@
 import { Button, ListGroup, ListGroupItem } from "react-bootstrap";
 import { Link, useMatch, useResolvedPath } from "react-router-dom";
+import HoverTooltip from "./ui/HoverTooltip";
 
 interface SidebarProps {
     isExpanded: boolean;
@@ -86,18 +87,22 @@ const SidebarItem = ({
     );
 
     return (
-        <ListGroupItem action active={!!match} title={label}>
-            <div className="ms-1">
-                {to.startsWith("http") ? (
-                    <a href={to} target="_blank" rel="noreferrer">
-                        <Contents />
-                    </a>
-                ) : (
-                    <Link to={to}>
-                        <Contents />
-                    </Link>
-                )}
-            </div>
+        <ListGroupItem action active={!!match}>
+            <HoverTooltip
+                tooltip={isExpanded ? undefined : label}
+                placement="right">
+                <div className="ms-1">
+                    {to.startsWith("http") ? (
+                        <a href={to} target="_blank" rel="noreferrer">
+                            <Contents />
+                        </a>
+                    ) : (
+                        <Link to={to}>
+                            <Contents />
+                        </Link>
+                    )}
+                </div>
+            </HoverTooltip>
         </ListGroupItem>
     );
 };

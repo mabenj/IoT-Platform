@@ -10,8 +10,8 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import useLocalStorage from "../hooks/useLocalStorage";
 import ClientRoutes from "../routes/routes";
 import DeviceService from "../services/DeviceService";
-import Breadcrumb from "./Breadcrumb";
 import Sidebar from "./Sidebar";
+import Breadcrumb from "./ui/Breadcrumb";
 
 const SIDEBAR_STATE_KEY = "iot.sidebar.expanded;";
 

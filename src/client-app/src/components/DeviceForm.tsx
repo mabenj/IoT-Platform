@@ -10,6 +10,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate } from "react-router-dom";
 import { Device } from "../../../interfaces/device.interface";
 import { TimeSeriesConfiguration } from "../../../interfaces/time-series-configuration.interface";
+import HoverTooltip from "./ui/HoverTooltip";
 
 const ACCESS_TOKEN_REGEX = "[a-zA-Z0-9]{8,}";
 const ACCESS_TOKEN_ALPHABET =
@@ -186,9 +187,13 @@ export default function DeviceForm({
                 <Row>
                     <LabelCol>
                         <Form.Label>
-                            <span>
-                                Device Name <Asterisk isEditing={isEditing} />
-                            </span>
+                            <HoverTooltip
+                                tooltip={isEditing ? "Required" : undefined}>
+                                <span>
+                                    Device Name{" "}
+                                    <Asterisk isEditing={isEditing} />
+                                </span>
+                            </HoverTooltip>
                         </Form.Label>
                     </LabelCol>
                     <ValueCol hidden={!isEditing}>
@@ -294,7 +299,13 @@ export default function DeviceForm({
                 <Row>
                     <LabelCol>
                         <Form.Label>
-                            Access Token <Asterisk isEditing={isEditing} />
+                            <HoverTooltip
+                                tooltip={isEditing ? "Required" : undefined}>
+                                <span>
+                                    Access Token{" "}
+                                    <Asterisk isEditing={isEditing} />
+                                </span>
+                            </HoverTooltip>
                         </Form.Label>
                     </LabelCol>
                     <ValueCol hidden={!isEditing}>
@@ -306,20 +317,22 @@ export default function DeviceForm({
                                 pattern={ACCESS_TOKEN_REGEX}
                                 disabled={isRegistering}
                             />
-                            <Button
-                                variant="outline-secondary"
-                                onClick={() => generateAccessToken()}
-                                title="Generate access token"
-                                disabled={isRegistering}>
-                                <span className="mdi mdi-refresh"></span>
-                            </Button>
-                            <Button
-                                variant="outline-secondary"
-                                onClick={() => copyAccessToken()}
-                                title="Copy to clipboard"
-                                disabled={isRegistering}>
-                                <span className="mdi mdi-content-copy"></span>
-                            </Button>
+                            <HoverTooltip tooltip="Generate an access token">
+                                <Button
+                                    variant="outline-secondary"
+                                    onClick={() => generateAccessToken()}
+                                    disabled={isRegistering}>
+                                    <span className="mdi mdi-refresh"></span>
+                                </Button>
+                            </HoverTooltip>
+                            <HoverTooltip tooltip="Copy to clipboard">
+                                <Button
+                                    variant="outline-secondary"
+                                    onClick={() => copyAccessToken()}
+                                    disabled={isRegistering}>
+                                    <span className="mdi mdi-content-copy"></span>
+                                </Button>
+                            </HoverTooltip>
                             <Form.Control.Feedback type="invalid">
                                 Provide a valid access token. It must be at
                                 least 8 characters long and contain only letters
@@ -350,29 +363,32 @@ export default function DeviceForm({
                                     initialDevice?.accessToken || ""
                                 )}
                             </span>
-                            <Button
-                                variant=""
-                                onClick={() =>
-                                    setIsAccessTokenVisible((prev) => !prev)
-                                }
-                                title={
+                            <HoverTooltip
+                                tooltip={
                                     isAccessTokenVisible
                                         ? "Hide access token"
                                         : "Show access token"
                                 }>
-                                {isAccessTokenVisible ? (
-                                    <span className="mdi mdi-eye-off"></span>
-                                ) : (
-                                    <span className="mdi mdi-eye"></span>
-                                )}
-                            </Button>
-                            <Button
-                                variant=""
-                                onClick={() => copyAccessToken()}
-                                title="Copy to clipboard"
-                                disabled={isRegistering}>
-                                <span className="mdi mdi-content-copy"></span>
-                            </Button>
+                                <Button
+                                    variant=""
+                                    onClick={() =>
+                                        setIsAccessTokenVisible((prev) => !prev)
+                                    }>
+                                    {isAccessTokenVisible ? (
+                                        <span className="mdi mdi-eye-off"></span>
+                                    ) : (
+                                        <span className="mdi mdi-eye"></span>
+                                    )}
+                                </Button>
+                            </HoverTooltip>
+                            <HoverTooltip tooltip="Copy to clipboard">
+                                <Button
+                                    variant=""
+                                    onClick={() => copyAccessToken()}
+                                    disabled={isRegistering}>
+                                    <span className="mdi mdi-content-copy"></span>
+                                </Button>
+                            </HoverTooltip>
                         </ValueField>
                     </ValueCol>
                 </Row>
@@ -482,18 +498,19 @@ export default function DeviceForm({
                                                         />
                                                     </td>
                                                     <td>
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline-danger"
-                                                            size="sm"
-                                                            title="Delete configuration"
-                                                            onClick={() =>
-                                                                removeTimeSeriesConfig(
-                                                                    index
-                                                                )
-                                                            }>
-                                                            <span className="mdi mdi-delete"></span>
-                                                        </Button>
+                                                        <HoverTooltip tooltip="Delete configuration">
+                                                            <Button
+                                                                type="button"
+                                                                variant="danger"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    removeTimeSeriesConfig(
+                                                                        index
+                                                                    )
+                                                                }>
+                                                                <span className="mdi mdi-delete"></span>
+                                                            </Button>
+                                                        </HoverTooltip>
                                                     </td>
                                                 </tr>
                                             )
@@ -527,27 +544,27 @@ export default function DeviceForm({
                             <ListGroup>
                                 {timeSeriesConfigs.map((config, index) => (
                                     <ListGroup.Item key={index}>
-                                        <span title="Value field">
-                                            {config.valueField}
-                                            {config.displayName && (
-                                                <small title="Display name">
-                                                    <span className="mx-2">
-                                                        -
-                                                    </span>
+                                        <HoverTooltip tooltip="Value field">
+                                            <span>{config.valueField}</span>
+                                        </HoverTooltip>
+                                        {config.displayName && (
+                                            <small>
+                                                <span className="mx-2">-</span>
+                                                <HoverTooltip tooltip="Display name">
                                                     <em>
                                                         {config.displayName}
                                                     </em>
-                                                </small>
-                                            )}
-                                            {config.unit && (
-                                                <small title="Unit">
-                                                    <span className="mx-2">
-                                                        -
-                                                    </span>
+                                                </HoverTooltip>
+                                            </small>
+                                        )}
+                                        {config.unit && (
+                                            <small>
+                                                <span className="mx-2">-</span>
+                                                <HoverTooltip tooltip="Unit">
                                                     <em>{config.unit}</em>
-                                                </small>
-                                            )}
-                                        </span>
+                                                </HoverTooltip>
+                                            </small>
+                                        )}
                                     </ListGroup.Item>
                                 ))}
                             </ListGroup>
@@ -651,7 +668,6 @@ const Asterisk = ({ isEditing }: AsteriskProps) => {
     return (
         <sup
             className="mdi mdi-asterisk text-primary"
-            title="This is a required field"
             style={{ fontSize: "0.5rem" }}></sup>
     );
 };

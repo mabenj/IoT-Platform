@@ -33,6 +33,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import DeviceDataService from "../services/DeviceDataService";
 import { generateHexColor, range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
+import HoverTooltip from "./ui/HoverTooltip";
 
 const CHUNK_SIZE = 200;
 
@@ -173,33 +174,31 @@ export default function ViewDeviceData() {
                     )}
                 <div className="mt-4 d-flex gap-2">
                     <Button
-                        title="Refresh data"
                         onClick={() => refreshData()}
                         disabled={deviceData.size < 1 || isExporting}>
                         <span className="mdi mdi-reload"></span> Refresh data
                     </Button>
-                    <Button
-                        title="Export all device data as JSON"
-                        disabled={deviceData.size < 1 || isExporting}
-                        onClick={() => exportData()}>
-                        {isExporting ? (
-                            <Spinner
-                                animation="border"
-                                size="sm"
-                                className="me-2"
-                            />
-                        ) : (
-                            <span className="mdi mdi-cloud-download"></span>
-                        )}{" "}
-                        Export JSON
-                    </Button>
+                    <HoverTooltip tooltip="Export all device data as JSON">
+                        <Button
+                            disabled={deviceData.size < 1 || isExporting}
+                            onClick={() => exportData()}>
+                            {isExporting ? (
+                                <Spinner
+                                    animation="border"
+                                    size="sm"
+                                    className="me-2"
+                                />
+                            ) : (
+                                <span className="mdi mdi-cloud-download"></span>
+                            )}{" "}
+                            Export JSON
+                        </Button>
+                    </HoverTooltip>
                     <OverlayTrigger
                         trigger="focus"
                         placement="top"
                         overlay={confirmDeletePopover}>
-                        <Button
-                            title="Delete all device data"
-                            disabled={deviceData.size < 1 || isExporting}>
+                        <Button disabled={deviceData.size < 1 || isExporting}>
                             <span className="mdi mdi-delete"></span> Delete All
                             Data
                         </Button>
@@ -261,9 +260,7 @@ const TimeSeriesGraph = ({
         const yAxisFields = timeSeriesConfigs.map(
             (config) => config.valueField
         );
-        const units = timeSeriesConfigs.map(
-            (config) => config.unit || config.valueField
-        );
+        const units = timeSeriesConfigs.map((config) => config.unit);
         const displayNames = timeSeriesConfigs.map(
             (config) => config.displayName || config.valueField
         );
@@ -418,49 +415,51 @@ const TimeSeriesGraph = ({
 
     const ScaleButtons = () => (
         <div className="w-100 d-flex justify-content-center my-3">
-            <ButtonGroup vertical={isMobile}>
-                <Button
-                    disabled
-                    variant="primary"
-                    onClick={() => setScale(ALL_TIME_DAYS)}
-                    active={scaleInDays === ALL_TIME_DAYS}>
-                    All time
-                </Button>
-                <Button
-                    disabled
-                    variant="primary"
-                    onClick={() => setScale(ONE_YEAR)}
-                    active={scaleInDays === ONE_YEAR}>
-                    1 year
-                </Button>
-                <Button
-                    disabled
-                    variant="primary"
-                    onClick={() => setScale(SIX_MONTHS)}
-                    active={scaleInDays === SIX_MONTHS}>
-                    6 months
-                </Button>
-                <Button
-                    disabled
-                    variant="primary"
-                    onClick={() => setScale(ONE_MONTH)}
-                    active={scaleInDays === ONE_MONTH}>
-                    1 month
-                </Button>
-                <Button
-                    disabled
-                    variant="primary"
-                    onClick={() => setScale(ONE_WEEK)}
-                    active={scaleInDays === ONE_WEEK}>
-                    1 week
-                </Button>
-                <Button
-                    variant="primary"
-                    onClick={() => setScale(1)}
-                    active={scaleInDays === 1}>
-                    24 hours
-                </Button>
-            </ButtonGroup>
+            <HoverTooltip tooltip="Scale of data">
+                <ButtonGroup vertical={isMobile}>
+                    <Button
+                        disabled
+                        variant="primary"
+                        onClick={() => setScale(ALL_TIME_DAYS)}
+                        active={scaleInDays === ALL_TIME_DAYS}>
+                        All time
+                    </Button>
+                    <Button
+                        disabled
+                        variant="primary"
+                        onClick={() => setScale(ONE_YEAR)}
+                        active={scaleInDays === ONE_YEAR}>
+                        1 year
+                    </Button>
+                    <Button
+                        disabled
+                        variant="primary"
+                        onClick={() => setScale(SIX_MONTHS)}
+                        active={scaleInDays === SIX_MONTHS}>
+                        6 months
+                    </Button>
+                    <Button
+                        disabled
+                        variant="primary"
+                        onClick={() => setScale(ONE_MONTH)}
+                        active={scaleInDays === ONE_MONTH}>
+                        1 month
+                    </Button>
+                    <Button
+                        disabled
+                        variant="primary"
+                        onClick={() => setScale(ONE_WEEK)}
+                        active={scaleInDays === ONE_WEEK}>
+                        1 week
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => setScale(1)}
+                        active={scaleInDays === 1}>
+                        24 hours
+                    </Button>
+                </ButtonGroup>
+            </HoverTooltip>
         </div>
     );
 
@@ -475,33 +474,38 @@ const TimeSeriesGraph = ({
                         </div>
                     </Card.Title>
                     <Card.Subtitle className="iot-time-series-timestamp">
-                        {latestData &&
-                            formatTimestamp(latestData["timeStamp"], true)}
+                        <HoverTooltip tooltip="Timestamp">
+                            <span className="font-monospace">
+                                {latestData &&
+                                    formatTimestamp(
+                                        latestData["timeStamp"],
+                                        true
+                                    )}
+                            </span>
+                        </HoverTooltip>
                     </Card.Subtitle>
-                    <div className="iot-time-series-value1">
-                        <span className="font-monospace fs-5">
-                            {displayNames[0]}
-                        </span>
-                        <div>
-                            <Badge bg="secondary" className="ms-3 fs-6">
-                                {(latestData && latestData[yAxisFields[0]]) +
-                                    " " +
-                                    units[0]}
-                            </Badge>
+                    {range(0, 1).map((index) => (
+                        <div
+                            key={index}
+                            className={`iot-time-series-value${index + 1}`}>
+                            <HoverTooltip tooltip={`Data field ${index + 1}`}>
+                                <span className="font-monospace">
+                                    {displayNames[index]}
+                                </span>
+                            </HoverTooltip>
+                            <HoverTooltip
+                                tooltip={`Value of data field ${index + 1}`}>
+                                <Badge bg="secondary" className="ms-3 fs-6">
+                                    {latestData
+                                        ? latestData[yAxisFields[index]]
+                                        : null}
+                                    {latestData && units[index]
+                                        ? " " + units[index]
+                                        : null}
+                                </Badge>
+                            </HoverTooltip>
                         </div>
-                    </div>
-                    <div className="iot-time-series-value2">
-                        <span className="font-monospace fs-5">
-                            {displayNames[1]}
-                        </span>
-                        <div>
-                            <Badge bg="secondary" className="ms-3 fs-6">
-                                {(latestData && latestData[yAxisFields[1]]) +
-                                    " " +
-                                    units[1]}
-                            </Badge>
-                        </div>
-                    </div>
+                    ))}
                 </div>
                 <div className="w-100 h-100 mt-2 d-flex justify-content-center">
                     {isMobile ? (
