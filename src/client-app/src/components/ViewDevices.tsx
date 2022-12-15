@@ -78,8 +78,9 @@ interface DeviceCardProps {
 const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
     const deleteDevice = async (event: React.MouseEvent) => {
         event.preventDefault();
-        onDeleteDevice();
-        DeviceService.deleteDevice(device.id!);
+        alert("Not allowed"); //TODO
+        // onDeleteDevice();
+        // DeviceService.deleteDevice(device.id!);
     };
 
     const confirmDeletePopover = (

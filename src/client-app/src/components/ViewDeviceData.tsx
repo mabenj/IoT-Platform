@@ -109,9 +109,10 @@ export default function ViewDeviceData() {
     };
 
     const deleteAllData = async () => {
-        await DeviceDataService.deleteAllDeviceData(device?.id!);
-        setDeviceData(new Map());
-        setTotalDeviceDataCount(0);
+        alert("Not allowed"); //TODO
+        // await DeviceDataService.deleteAllDeviceData(device?.id!);
+        // setDeviceData(new Map());
+        // setTotalDeviceDataCount(0);
     };
 
     const refreshData = async () => {
