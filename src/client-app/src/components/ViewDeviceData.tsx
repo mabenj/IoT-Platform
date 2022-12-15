@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Badge, ButtonGroup, Modal } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
@@ -155,10 +155,10 @@ export default function ViewDeviceData() {
                     ))}
                 {isFetchingData &&
                     range(0, 10).map((index) => (
-                        <>
-                            <DeviceDataPlaceholder key={index} />
+                        <React.Fragment key={index}>
+                            <DeviceDataPlaceholder />
                             <br />
-                        </>
+                        </React.Fragment>
                     ))}
                 {!isFetchingData && deviceData.size === 0 && (
                     <Alert variant="warning" className="mt-5">
