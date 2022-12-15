@@ -328,7 +328,12 @@ export default function DeviceForm({
                         </InputGroup>
                         <Form.Text muted>
                             Access token is used to link the real physical
-                            device to IoT-Platform
+                            device to IoT-Platform. <br />
+                            Example HTTP POST URL to send data to IoT Platform:{" "}
+                            <code>
+                                https://iot-platform.example.com/{"{"}
+                                access_token_here{"}"}
+                            </code>
                         </Form.Text>
                     </ValueCol>
                     <ValueCol hidden={isEditing}>
