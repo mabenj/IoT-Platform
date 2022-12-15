@@ -407,7 +407,7 @@ const TimeSeriesGraph = ({
     return (
         <Card className="my-5">
             <Card.Header>Time Series</Card.Header>
-            <Card.Body>
+            <Card.Body className="d-flex flex-column align-items-center">
                 <div className="iot-time-series-latest-value">
                     <Card.Title>
                         <div className="iot-time-series-title">
