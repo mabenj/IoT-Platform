@@ -558,43 +558,45 @@ export default function DeviceForm({
             <Row>
                 <LabelCol></LabelCol>
                 <ValueCol>
-                    {isEditing ? (
-                        <>
-                            <Button
-                                variant="primary"
-                                type="submit"
-                                disabled={isRegistering}>
-                                {isRegistering ? (
-                                    <Spinner animation="border" size="sm" />
-                                ) : (
-                                    <span className="mdi mdi-check"></span>
-                                )}{" "}
-                                {isCreatingNew
-                                    ? "Register Device"
-                                    : "Update Device"}
-                            </Button>
-                            <Button
-                                variant="secondary"
-                                type="reset"
-                                onClick={() => handleCancel()}
-                                className="mx-3">
-                                <span className="mdi mdi-close"></span> Cancel
-                            </Button>
-                        </>
-                    ) : (
-                        <>
-                            <Button variant="primary" type="submit">
-                                Modify Device
-                            </Button>
-                            <Link
-                                to={`/viewDevices/${initialDevice?.id}/viewdata`}
-                                state={{ device: initialDevice }}>
-                                <Button className="mx-3">
-                                    View Device Data
+                    <div className="d-flex gap-2">
+                        {isEditing ? (
+                            <>
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                    disabled={isRegistering}>
+                                    {isRegistering ? (
+                                        <Spinner animation="border" size="sm" />
+                                    ) : (
+                                        <span className="mdi mdi-check"></span>
+                                    )}{" "}
+                                    {isCreatingNew
+                                        ? "Register Device"
+                                        : "Update Device"}
                                 </Button>
-                            </Link>
-                        </>
-                    )}
+                                <Button
+                                    variant="secondary"
+                                    type="reset"
+                                    onClick={() => handleCancel()}>
+                                    <span className="mdi mdi-close"></span>{" "}
+                                    Cancel
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="primary" type="submit">
+                                    Modify Device
+                                </Button>
+                                <Link
+                                    to={`/viewDevices/${initialDevice?.id}/viewdata`}
+                                    state={{ device: initialDevice }}>
+                                    <Button className="mx-3">
+                                        View Device Data
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                    </div>
                 </ValueCol>
             </Row>
         </Form>
