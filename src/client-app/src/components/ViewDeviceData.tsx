@@ -1,6 +1,12 @@
 import { format } from "date-fns";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Badge, ButtonGroup, Modal } from "react-bootstrap";
+import {
+    Badge,
+    ButtonGroup,
+    Modal,
+    OverlayTrigger,
+    Popover
+} from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -131,6 +137,25 @@ export default function ViewDeviceData() {
         setIsFetchingData(false);
     };
 
+    const confirmDeletePopover = (
+        <Popover>
+            <Popover.Body>
+                <div>
+                    Are you sure you want to delete <strong>all</strong> device
+                    data? This cannot be undone.
+                </div>
+                <div className="d-flex justify-content-center gap-2 mt-2">
+                    <Button size="sm" variant="secondary">
+                        Cancel
+                    </Button>
+                    <Button size="sm" variant="danger" onClick={deleteAllData}>
+                        <span className="mdi mdi-delete"></span> Delete
+                    </Button>
+                </div>
+            </Popover.Body>
+        </Popover>
+    );
+
     return (
         <div>
             <h2>Device Data - {device?.name}</h2>
@@ -167,12 +192,17 @@ export default function ViewDeviceData() {
                         )}{" "}
                         Export JSON
                     </Button>
-                    <Button
-                        title="Delete all device data"
-                        onClick={() => deleteAllData()}
-                        disabled={deviceData.size < 1 || isExporting}>
-                        <span className="mdi mdi-delete"></span> Delete All Data
-                    </Button>
+                    <OverlayTrigger
+                        trigger="focus"
+                        placement="top"
+                        overlay={confirmDeletePopover}>
+                        <Button
+                            title="Delete all device data"
+                            disabled={deviceData.size < 1 || isExporting}>
+                            <span className="mdi mdi-delete"></span> Delete All
+                            Data
+                        </Button>
+                    </OverlayTrigger>
                 </div>
                 <small className="text-muted d-block mt-4">
                     Showing {deviceData.size} out of {totalDeviceDataCount}{" "}

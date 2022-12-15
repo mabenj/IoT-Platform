@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Badge, Button } from "react-bootstrap";
+import { Badge, Button, OverlayTrigger, Popover } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import ListGroup from "react-bootstrap/ListGroup";
 import Placeholder from "react-bootstrap/Placeholder";
@@ -82,13 +82,32 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
         DeviceService.deleteDevice(device.id!);
     };
 
+    const confirmDeletePopover = (
+        <Popover>
+            <Popover.Body>
+                <div>
+                    Are you sure you want to delete this device? This cannot be
+                    undone.
+                </div>
+                <div className="d-flex justify-content-center gap-2 mt-2">
+                    <Button size="sm" variant="secondary">
+                        Cancel
+                    </Button>
+                    <Button size="sm" variant="danger" onClick={deleteDevice}>
+                        <span className="mdi mdi-delete"></span> Delete
+                    </Button>
+                </div>
+            </Popover.Body>
+        </Popover>
+    );
+
     return (
         <ListGroup.Item action>
-            <Link
-                to={`/viewDevices/${device.id}`}
-                state={{ device }}
-                title={`Description: ${device.description || "empty"}`}>
-                <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div className="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <Link
+                    to={`/viewDevices/${device.id}`}
+                    state={{ device }}
+                    title={`Description: ${device.description || "empty"}`}>
                     <div className="flex-grow-1">
                         <span className="hover-underline me-2">
                             {device.name}
@@ -100,39 +119,41 @@ const DeviceItem = ({ device, onDeleteDevice }: DeviceCardProps) => {
                             </em>
                         </small>
                     </div>
-                    <div className="d-flex gap-5">
-                        <div className="d-flex gap-2">
-                            <div>
-                                <Badge
-                                    pill
-                                    bg={
-                                        device.enabled ? "success" : "secondary"
-                                    }
-                                    className="">
-                                    {device.enabled ? "Enabled" : "Disabled"}
-                                </Badge>
-                            </div>
-                            <div>
-                                <Badge bg="primary" pill className="">
-                                    {device.protocol === "http"
-                                        ? "HTTP"
-                                        : device.protocol === "coap"
-                                        ? "CoAP"
-                                        : "Unknown"}
-                                </Badge>
-                            </div>
+                </Link>
+                <div className="d-flex gap-5">
+                    <div className="d-flex gap-2">
+                        <div>
+                            <Badge
+                                pill
+                                bg={device.enabled ? "success" : "secondary"}
+                                className="">
+                                {device.enabled ? "Enabled" : "Disabled"}
+                            </Badge>
                         </div>
+                        <div>
+                            <Badge bg="primary" pill className="">
+                                {device.protocol === "http"
+                                    ? "HTTP"
+                                    : device.protocol === "coap"
+                                    ? "CoAP"
+                                    : "Unknown"}
+                            </Badge>
+                        </div>
+                    </div>
+                    <OverlayTrigger
+                        trigger="focus"
+                        placement="top"
+                        overlay={confirmDeletePopover}>
                         <Button
                             variant="danger"
                             size="sm"
                             className="hover-filter"
-                            onClick={deleteDevice}
                             title="Delete the device">
                             Delete <span className="mdi mdi-delete"></span>
                         </Button>
-                    </div>
+                    </OverlayTrigger>
                 </div>
-            </Link>
+            </div>
         </ListGroup.Item>
     );
 };
