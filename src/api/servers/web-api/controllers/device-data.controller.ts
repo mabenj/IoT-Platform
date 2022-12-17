@@ -35,8 +35,9 @@ async function deleteDeviceData(
     req: Request<{ deviceId: string }>,
     res: Response
 ) {
-    await DeviceDataService.removeDeviceData(req.params.deviceId);
-    res.status(204).send();
+    res.status(403).send("Not allowed");
+    // await DeviceDataService.removeDeviceData(req.params.deviceId);
+    // res.status(204).send();
 }
 
 export default {
