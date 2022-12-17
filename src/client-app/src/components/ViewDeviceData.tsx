@@ -473,6 +473,10 @@ const TimeSeriesGraph = ({
                         </div>
                     </Card.Title>
                     <Card.Subtitle className="iot-time-series-timestamp">
+                        <div className="text-muted text-center mb-2">
+                            {latestData &&
+                                timeAgo(new Date(latestData["timeStamp"]))}
+                        </div>
                         <HoverTooltip tooltip="Timestamp">
                             <span className="font-monospace">
                                 {latestData &&
