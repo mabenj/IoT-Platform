@@ -79,3 +79,8 @@ export function randomFloat(min: number, max: number, decimals: number = 2) {
     const str = (Math.random() * (max - min) + min).toFixed(decimals);
     return parseFloat(str);
 }
+
+export function getErrorMessage(error: unknown) {
+    if (error instanceof Error) return error.message;
+    return String(error);
+}
