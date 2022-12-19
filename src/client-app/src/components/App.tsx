@@ -18,12 +18,14 @@ const SIDEBAR_STATE_KEY = "iot.sidebar.expanded;";
 interface IDevicesContext {
     devices: Device[];
     setDevices: React.Dispatch<React.SetStateAction<Device[]>>;
+    fetchingDevices: boolean;
 }
 
 export const DevicesContext = React.createContext<IDevicesContext | null>(null);
 
 function App() {
     const [devices, setDevices] = useState<Device[]>([]);
+    const [fetchingDevices, setFetchingDevices] = useState(false);
     const isMobile = useIsMobile();
     const [sidebarExpanded, setSidebarExpanded] = useLocalStorage(
         SIDEBAR_STATE_KEY,
@@ -32,7 +34,12 @@ function App() {
 
     useEffect(() => {
         async function fetchDevices() {
-            setDevices(await DeviceService.getAllDevices());
+            setFetchingDevices(true);
+            setDevices(
+                await DeviceService.getAllDevices().finally(() =>
+                    setFetchingDevices(false)
+                )
+            );
         }
         fetchDevices();
     }, [setDevices]);
@@ -47,7 +54,8 @@ function App() {
                 className={`iot-main-content ${
                     sidebarExpanded && "iot-main-content-padded"
                 }`}>
-                <DevicesContext.Provider value={{ devices, setDevices }}>
+                <DevicesContext.Provider
+                    value={{ devices, setDevices, fetchingDevices }}>
                     <MainContent />
                 </DevicesContext.Provider>
             </main>

@@ -29,7 +29,11 @@ export default function ViewDevices() {
         <>
             <div className="mb-5">
                 <h2 className="d-inline">Registered Devices</h2>
-                {isLoading && <Spinner animation="border" className="mx-3" />}
+                {isLoading && (
+                    <div className="d-flex align-items-center gap-3 my-4">
+                        <Spinner size="sm" /> Loading devices...
+                    </div>
+                )}
             </div>
             <ListGroup className="shadow-sm">
                 {isLoading &&

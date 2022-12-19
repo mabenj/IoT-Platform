@@ -53,7 +53,7 @@ export default function ViewDeviceData() {
         CHUNK_SIZE
     ]);
     const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
-    const [isFetchingData, setIsFetchingData] = useState(true);
+    const [isFetchingData, setIsFetchingData] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
@@ -314,8 +314,8 @@ const TimeSeriesGraph = ({
 
     if (loading) {
         return (
-            <div className="w-100 d-flex justify-content-center my-6 mt-5">
-                <Spinner variant="primary" />
+            <div className="w-100 d-flex align-items-center gap-3 my-6 mt-5">
+                <Spinner size="sm" /> Loading time series data...
             </div>
         );
     }

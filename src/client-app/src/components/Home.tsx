@@ -1,12 +1,12 @@
 import { useContext } from "react";
-import { ListGroup } from "react-bootstrap";
+import { ListGroup, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { caseInsensitiveSorter } from "../utils/utils";
 import { DevicesContext } from "./App";
 import HoverTooltip from "./ui/HoverTooltip";
 
 export default function Home() {
-    const { devices } = useContext(DevicesContext) || {
+    const { devices, fetchingDevices } = useContext(DevicesContext) || {
         devices: []
     };
     return (
@@ -27,17 +27,27 @@ export default function Home() {
                 />
             </div>
             <h2 className="mt-5">View Data</h2>
+            {fetchingDevices && (
+                <div className="d-flex align-items-center gap-3 my-4">
+                    <Spinner size="sm" /> Loading data...
+                </div>
+            )}
             <ListGroup className="mt-3">
                 {devices.sort(caseInsensitiveSorter("name")).map((device) => (
                     <ListGroup.Item action key={device.id}>
-                        <Link
-                            to={`/viewDevices/${device.id}/viewdata`}
-                            state={{ device }}
-                            className="hover-underline">
-                            <div className="d-flex">
-                                <div className="flex-grow-1">{device.name}</div>
-                            </div>
-                        </Link>
+                        <div className="d-flex gap-3">
+                            <span className="mdi mdi-chart-bar"></span>
+                            <Link
+                                to={`/viewDevices/${device.id}/viewdata`}
+                                state={{ device }}
+                                className="hover-underline">
+                                <div className="d-flex">
+                                    <div className="flex-grow-1">
+                                        {device.name}
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
