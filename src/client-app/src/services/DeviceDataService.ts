@@ -18,6 +18,23 @@ async function getDeviceData(
     };
 }
 
+async function getDeviceDataByDate(
+    deviceId: string,
+    startDate: Date,
+    stopDate: Date
+): Promise<GetDeviceDataResponse> {
+    const response = await axios.get<GetDeviceDataResponse>(
+        `/api/deviceData/${deviceId}?startDate=${startDate.toISOString()}&endDate=${stopDate.toISOString()}`
+    );
+    return {
+        ...response.data,
+        deviceData: response.data.deviceData.map((deviceDatum) => ({
+            ...deviceDatum,
+            createdAt: new Date(deviceDatum.createdAt)
+        }))
+    };
+}
+
 async function exportAllDeviceData(deviceId: string) {
     const response = await axios.get(`/api/deviceData/${deviceId}/exportJson`, {
         responseType: "blob"
@@ -44,7 +61,8 @@ async function deleteAllDeviceData(deviceId: string) {
 const DeviceDataService = {
     getDeviceData,
     deleteAllDeviceData,
-    exportAllDeviceData
+    exportAllDeviceData,
+    getDeviceDataByDate
 };
 
 export default DeviceDataService;
