@@ -89,12 +89,7 @@ export default function ViewDeviceData() {
                 {device?.hasTimeSeries &&
                     device.timeSeriesConfigurations.length > 0 && (
                         <TimeSeriesGraph
-                            deviceData={currentDataChunk}
-                            timeSeriesConfigs={
-                                device?.timeSeriesConfigurations || []
-                            }
-                            loading={isFetching}
-                            onDataRequested={getDeviceData}
+                            deviceId={device.id!}
                         />
                     )}
                 <div className="mt-4 d-flex gap-2">

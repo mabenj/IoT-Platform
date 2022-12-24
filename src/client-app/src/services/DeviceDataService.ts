@@ -1,5 +1,6 @@
 import axios from "axios";
 import { GetDeviceDataResponse } from "../../../interfaces/get-device-data-response.interface";
+import { GetDeviceTimeSeriesResponse } from "../../../interfaces/get-device-time-series-response.interface";
 
 async function getDeviceData(
     deviceId: string,
@@ -58,11 +59,19 @@ async function deleteAllDeviceData(deviceId: string) {
     await axios.delete(`/api/deviceData/${deviceId}`);
 }
 
+async function getDeviceTimeSeries(deviceId: string, start: Date, end: Date) {
+    const response = await axios.get<GetDeviceTimeSeriesResponse>(
+        `/api/deviceData/${deviceId}/timeSeries?start=${start.getTime()}&end=${end.getTime()}`
+    );
+    return response.data;
+}
+
 const DeviceDataService = {
     getDeviceData,
     deleteAllDeviceData,
     exportAllDeviceData,
-    getDeviceDataByDate
+    getDeviceDataByDate,
+    getDeviceTimeSeries
 };
 
 export default DeviceDataService;

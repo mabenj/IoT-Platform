@@ -58,8 +58,31 @@ async function deleteDeviceData(
     // res.status(204).send();
 }
 
+async function getDeviceTimeSeries(
+    req: Request<
+        { deviceId: string },
+        {},
+        {},
+        { start?: string; end?: string }
+    >,
+    res: Response
+) {
+    if (!req.query.start || !req.query.end) {
+        res.status(400).send("Missing params");
+        return;
+    }
+    res.json(
+        await DeviceDataService.getTimeSeries(
+            req.params.deviceId,
+            new Date(+req.query.start),
+            new Date(+req.query.end)
+        )
+    );
+}
+
 export default {
     getDeviceData,
     deleteDeviceData,
-    exportDeviceDataJson
+    exportDeviceDataJson,
+    getDeviceTimeSeries
 };

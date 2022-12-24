@@ -1,5 +1,6 @@
-import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { differenceInDays, format, subMinutes } from "date-fns";
+import { subDays } from "date-fns/esm";
+import { useCallback, useEffect, useState } from "react";
 import { Badge, ButtonGroup, Modal } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
@@ -15,96 +16,115 @@ import {
     XAxis,
     YAxis
 } from "recharts";
-import { DeviceData } from "../../../interfaces/device-data.interface";
-import { TimeSeriesConfiguration } from "../../../interfaces/time-series-configuration.interface";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { generateHexColor, range, timeAgo } from "../utils/utils";
+import DeviceDataService from "../services/DeviceDataService";
+import { timeAgo } from "../utils/utils";
 import HoverTooltip from "./ui/HoverTooltip";
 
-const ALL_TIME_DAYS = Number.MAX_VALUE;
-const ONE_YEAR = 365;
-const ONE_MONTH = 30;
-const SIX_MONTHS = 6 * ONE_MONTH;
-const ONE_WEEK = 7;
+const ZOOM_LEVELS = {
+    allTime: -1,
+    oneYear: 365,
+    oneMonth: 30,
+    sixMonths: 6 * 30,
+    oneWeek: 7,
+    oneDay: 1
+};
+
+const LINE_COLOR_PALETTE = [
+    "#ea5545",
+    "#f46a9b",
+    "#ef9b20",
+    "#edbf33",
+    "#ede15b",
+    "#bdcf32",
+    "#87bc45",
+    "#27aeef",
+    "#b33dc6"
+];
 
 interface TimeSeriesGraphProps {
-    deviceData: DeviceData[];
-    timeSeriesConfigs: TimeSeriesConfiguration[];
-    loading: boolean;
-    onDataRequested: (daysToTake: number) => any;
+    deviceId: string;
 }
 
-export default function TimeSeriesGraph({
-    deviceData,
-    timeSeriesConfigs,
-    loading,
-    onDataRequested
-}: TimeSeriesGraphProps) {
+export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const [showAsModal, setShowAsModal] = useState(false);
     const isMobile = useIsMobile();
-    const [yAxisFields, setYAxisFields] = useState<string[]>([]);
     const [units, setUnits] = useState<string[]>([]);
     const [displayNames, setDisplayNames] = useState<string[]>([]);
-    const [formattedData, setFormattedData] = useState<Record<string, any>[]>(
-        []
+    const [timestamps, setTimestamps] = useState<number[]>([]);
+    const [timeSeriesValues, setTimeSeriesValues] = useState<any[][]>([]);
+    const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneDay);
+    const [isFetchingData, setIsFetchingData] = useState(false);
+
+    const latestTimestamp = timestamps[0];
+    const latestValues = timeSeriesValues.map((tsValues) => tsValues[0]);
+
+    const fetchTimeSeries = useCallback(
+        async (daysToTake: number) => {
+            if (!deviceId) {
+                return;
+            }
+            const now = new Date();
+            const startDate =
+                daysToTake === -1 ? new Date(0) : subDays(now, daysToTake);
+            setIsFetchingData(true);
+            const timeSeries = await DeviceDataService.getDeviceTimeSeries(
+                deviceId,
+                startDate,
+                now
+            );
+            setIsFetchingData(false);
+            setUnits(timeSeries.units);
+            setDisplayNames(timeSeries.displayNames);
+            setTimestamps(timeSeries.timestamps);
+            setTimeSeriesValues(timeSeries.timeSeriesValues);
+        },
+        [deviceId]
     );
-    const [scaleInDays, setScaleInDays] = useState(1);
 
     useEffect(() => {
-        const yAxisFields = timeSeriesConfigs.map(
-            (config) => config.valueField
-        );
-        const units = timeSeriesConfigs.map((config) => config.unit);
-        const displayNames = timeSeriesConfigs.map(
-            (config) => config.displayName || config.valueField
-        );
-        setYAxisFields(yAxisFields);
-        setUnits(units);
-        setDisplayNames(displayNames);
-    }, [timeSeriesConfigs]);
-
-    useEffect(() => {
-        const formattedData = deviceData.map(({ createdAt, data }) => {
-            let formatted: Record<string, any> = {
-                timeStamp: createdAt.getTime()
-            };
-            yAxisFields.forEach((field) => (formatted[field] = +data[field]));
-            return formatted;
-        });
-        setFormattedData(formattedData);
-    }, [deviceData, yAxisFields]);
-
-    const setScale = (scaleInDays: number) => {
-        setScaleInDays(scaleInDays);
-        onDataRequested(scaleInDays);
-        //TODO: fetch and set data
-    };
+        fetchTimeSeries(zoomLevel);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const formatTimestamp = (timestampMillis: number, longFormat?: boolean) => {
+        if (typeof timestampMillis !== "number") {
+            return format(new Date(), "yyyy-MM-dd HH:mm");
+        }
         if (longFormat) {
             return format(new Date(timestampMillis), "yyyy-MM-dd HH:mm");
         }
 
-        //TODO: check distance between last and first timestamp instead of scale
-        if (scaleInDays <= 1) {
+        const oldestTimestamp = timestamps[0];
+        const intervalDays = differenceInDays(
+            subMinutes(new Date(), 5),
+            new Date(oldestTimestamp)
+        );
+
+        if (intervalDays <= ZOOM_LEVELS.oneDay) {
             return format(new Date(timestampMillis), "HH:mm");
         }
-        if (scaleInDays <= ONE_WEEK) {
+        if (intervalDays <= ZOOM_LEVELS.oneWeek) {
             return format(new Date(timestampMillis), "yyyy-MM-dd HH:mm");
         }
-        if (scaleInDays <= ONE_MONTH) {
+        if (intervalDays <= ZOOM_LEVELS.oneMonth) {
             return format(new Date(timestampMillis), "yyyy-MM-dd");
         }
-        if (scaleInDays <= SIX_MONTHS) {
+        if (intervalDays <= ZOOM_LEVELS.sixMonths) {
             return format(new Date(timestampMillis), "yyyy-MM-dd");
         }
-        if (scaleInDays <= ONE_YEAR) {
+        if (intervalDays <= ZOOM_LEVELS.oneYear) {
             return format(new Date(timestampMillis), "yyyy-MM-dd");
         }
         return format(new Date(timestampMillis), "yyyy-MM-dd");
     };
 
-    if (loading) {
+    const changeZoomLevel = (levelInDays: number) => {
+        setZoomLevel(levelInDays);
+        fetchTimeSeries(levelInDays);
+    };
+
+    if (isFetchingData) {
         return (
             <div className="w-100 d-flex align-items-center gap-3 my-6 mt-5">
                 <Spinner size="sm" /> Loading time series data...
@@ -112,15 +132,13 @@ export default function TimeSeriesGraph({
         );
     }
 
-    if (deviceData.length === 0) {
+    if (timeSeriesValues.length === 0) {
         return (
             <Alert variant="warning" className="my-5">
-                No time series data available
+                No time series data available for this time frame
             </Alert>
         );
     }
-
-    const latestData = formattedData[formattedData.length - 1];
 
     const CustomTick = (props: any) => {
         const { x, y, payload } = props;
@@ -133,7 +151,7 @@ export default function TimeSeriesGraph({
                     dy={16}
                     textAnchor="end"
                     fill="#666"
-                    transform="rotate(-35)">
+                    transform="rotate(-20)">
                     {formatTimestamp(payload.value)}
                 </text>
             </g>
@@ -142,39 +160,37 @@ export default function TimeSeriesGraph({
 
     const Chart = () => (
         <ResponsiveContainer width="100%" height={500} minWidth={500}>
-            <LineChart data={formattedData} margin={{ bottom: 80 }}>
+            <LineChart
+                data={timestamps.map((ts, i) => ({
+                    timestamp: ts,
+                    value0: timeSeriesValues[0][i],
+                    value1: timeSeriesValues[1][i]
+                }))}
+                margin={{ bottom: 80 }}>
                 <Line
-                    yAxisId={0}
-                    type="linear"
-                    dataKey={yAxisFields[0]}
-                    stroke={generateHexColor(yAxisFields[0])}
-                    strokeWidth={1.8}
-                    unit={" " + units[0]}
-                    legendType="plainline"
+                    yAxisId="line0"
+                    unit={units[0] ? " " + units[0] : undefined}
                     name={displayNames[0]}
+                    dataKey="value0"
+                    type="linear"
+                    stroke={pickElement(LINE_COLOR_PALETTE, displayNames[0])}
+                    strokeWidth={1.8}
+                    legendType="plainline"
                     dot={false}
                 />
                 <Line
-                    yAxisId={1}
-                    type="linear"
-                    dataKey={yAxisFields[1]}
-                    stroke={generateHexColor(yAxisFields[1])}
-                    strokeWidth={1.8}
-                    unit={" " + units[1]}
-                    legendType="plainline"
+                    yAxisId="line1"
+                    unit={units[1] ? " " + units[1] : undefined}
                     name={displayNames[1]}
+                    dataKey="value1"
+                    type="linear"
+                    stroke={pickElement(LINE_COLOR_PALETTE, displayNames[1])}
+                    strokeWidth={1.8}
+                    legendType="plainline"
                     dot={false}
-                />
-
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis
-                    dataKey="timeStamp"
-                    angle={-10}
-                    tickFormatter={(val) => formatTimestamp(val)}
-                    tick={<CustomTick />}
                 />
                 <YAxis
-                    yAxisId={0}
+                    yAxisId="line0"
                     label={{
                         value: `${displayNames[0]} ${
                             units[0] && `(${units[0]})`
@@ -185,7 +201,7 @@ export default function TimeSeriesGraph({
                     }}
                 />
                 <YAxis
-                    yAxisId={1}
+                    yAxisId="line1"
                     label={{
                         value: `${displayNames[1]} ${
                             units[1] && `(${units[1]})`
@@ -196,6 +212,14 @@ export default function TimeSeriesGraph({
                     }}
                     orientation="right"
                 />
+                <XAxis
+                    dataKey="timestamp"
+                    angle={-10}
+                    tickFormatter={(val) => formatTimestamp(val)}
+                    tick={<CustomTick />}
+                />
+
+                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                 <Tooltip
                     labelFormatter={(value) => formatTimestamp(value, true)}
                 />
@@ -204,44 +228,44 @@ export default function TimeSeriesGraph({
         </ResponsiveContainer>
     );
 
-    const ScaleButtons = () => (
+    const ZoomLevelButtons = () => (
         <div className="w-100 d-flex justify-content-center my-3">
             <HoverTooltip tooltip="Scale of data">
                 <ButtonGroup vertical={isMobile}>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(ALL_TIME_DAYS)}
-                        active={scaleInDays === ALL_TIME_DAYS}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.allTime)}
+                        active={zoomLevel === ZOOM_LEVELS.allTime}>
                         All time
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(ONE_YEAR)}
-                        active={scaleInDays === ONE_YEAR}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.oneYear)}
+                        active={zoomLevel === ZOOM_LEVELS.oneYear}>
                         1 year
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(SIX_MONTHS)}
-                        active={scaleInDays === SIX_MONTHS}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.sixMonths)}
+                        active={zoomLevel === ZOOM_LEVELS.sixMonths}>
                         6 months
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(ONE_MONTH)}
-                        active={scaleInDays === ONE_MONTH}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.oneMonth)}
+                        active={zoomLevel === ZOOM_LEVELS.oneMonth}>
                         1 month
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(ONE_WEEK)}
-                        active={scaleInDays === ONE_WEEK}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.oneWeek)}
+                        active={zoomLevel === ZOOM_LEVELS.oneWeek}>
                         1 week
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => setScale(1)}
-                        active={scaleInDays === 1}>
+                        onClick={() => changeZoomLevel(ZOOM_LEVELS.oneDay)}
+                        active={zoomLevel === ZOOM_LEVELS.oneDay}>
                         24 hours
                     </Button>
                 </ButtonGroup>
@@ -261,37 +285,30 @@ export default function TimeSeriesGraph({
                     </Card.Title>
                     <Card.Subtitle className="iot-time-series-timestamp">
                         <div className="text-muted text-center mb-2">
-                            {latestData &&
-                                timeAgo(new Date(latestData["timeStamp"]))}
+                            {latestTimestamp &&
+                                timeAgo(new Date(latestTimestamp))}
                         </div>
                         <HoverTooltip tooltip="Timestamp">
                             <span className="font-monospace">
-                                {latestData &&
-                                    formatTimestamp(
-                                        latestData["timeStamp"],
-                                        true
-                                    )}
+                                {latestTimestamp &&
+                                    formatTimestamp(latestTimestamp, true)}
                             </span>
                         </HoverTooltip>
                     </Card.Subtitle>
-                    {range(0, 1).map((index) => (
+                    {latestValues.map((value, i) => (
                         <div
-                            key={index}
-                            className={`iot-time-series-value${index + 1}`}>
-                            <HoverTooltip tooltip={`Data field ${index + 1}`}>
+                            key={i}
+                            className={`iot-time-series-value${i + 1}`}>
+                            <HoverTooltip tooltip={`Data field ${i + 1}`}>
                                 <span className="font-monospace">
-                                    {displayNames[index]}
+                                    {displayNames[i]}
                                 </span>
                             </HoverTooltip>
                             <HoverTooltip
-                                tooltip={`Value of data field ${index + 1}`}>
+                                tooltip={`Value of data field ${i + 1}`}>
                                 <Badge bg="secondary" className="ms-3 fs-6">
-                                    {latestData
-                                        ? latestData[yAxisFields[index]]
-                                        : null}
-                                    {latestData && units[index]
-                                        ? " " + units[index]
-                                        : null}
+                                    {value}
+                                    {value && units[i] ? " " + units[i] : null}
                                 </Badge>
                             </HoverTooltip>
                         </div>
@@ -314,12 +331,23 @@ export default function TimeSeriesGraph({
                         </Modal.Header>
                         <Modal.Body>
                             <Chart />
-                            <ScaleButtons />
+                            <ZoomLevelButtons />
                         </Modal.Body>
                     </Modal>
                 </div>
-                {!isMobile && <ScaleButtons />}
+                {!isMobile && <ZoomLevelButtons />}
             </Card.Body>
         </Card>
     );
+}
+
+function pickElement<T>(arr: T[], input: string) {
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        hash = (hash << 5) - hash + input.charCodeAt(i);
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+
+    const index = hash % arr.length;
+    return arr[index];
 }
