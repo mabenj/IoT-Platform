@@ -217,6 +217,8 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                     angle={-10}
                     tickFormatter={(val) => formatTimestamp(val)}
                     tick={<CustomTick />}
+                    domain={["auto", "auto"]}
+                    type="number"
                 />
 
                 <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
