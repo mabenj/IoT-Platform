@@ -1,6 +1,8 @@
 import { DeviceData } from "./device-data.interface";
 
 export interface GetDeviceDataResponse {
-    deviceData: DeviceData[];
     count: number;
+    page: number;
+    pages: number;
+    deviceData: DeviceData[];
 }

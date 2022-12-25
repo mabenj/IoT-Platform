@@ -7,29 +7,29 @@ import Device from "../models/device.model";
 import { getDateString } from "../utils/utils";
 import DeviceService from "./device.service";
 
-async function getAllDeviceData(
-    deviceId: string
-): Promise<GetDeviceDataResponse> {
+const ITEMS_PER_PAGE = 20;
+
+async function getAllDeviceData(deviceId: string) {
     const deviceData = (await DeviceData.find({ deviceId }).exec()) || [];
     return Promise.resolve({ deviceData, count: deviceData.length });
 }
 
-async function getMostRecentDeviceData(
+async function getDeviceData(
     deviceId: string,
-    start?: number,
-    stop?: number
+    page: number
 ): Promise<GetDeviceDataResponse> {
-    if (start && stop) {
-        const deviceData =
-            (await DeviceData.find({ deviceId })
-                .sort({ createdAt: -1 })
-                .limit(stop)
-                .skip(start)
-                .exec()) || [];
-        const count = await DeviceData.countDocuments({ deviceId });
-        return Promise.resolve({ deviceData, count });
-    }
-    return getAllDeviceData(deviceId);
+    const deviceData = await DeviceData.find({ deviceId })
+        .sort({ createdAt: -1 })
+        .skip(ITEMS_PER_PAGE * (page - 1))
+        .limit(ITEMS_PER_PAGE)
+        .exec();
+    const count = await DeviceData.countDocuments({ deviceId });
+    return {
+        count,
+        page,
+        pages: Math.ceil(count / ITEMS_PER_PAGE),
+        deviceData
+    };
 }
 
 async function addDeviceData(
@@ -58,20 +58,6 @@ async function exportToJson(deviceId: string) {
         new Date()
     )}.json`;
     return { json, filename };
-}
-
-async function getBetween(
-    deviceId: string,
-    startDate: Date,
-    endDate: Date
-): Promise<GetDeviceDataResponse> {
-    const deviceData =
-        (await DeviceData.find({ deviceId })
-            .sort({ createdAt: -1 })
-            .find({ createdAt: { $gte: startDate, $lt: endDate } })
-            .exec()) || [];
-    const count = await DeviceData.countDocuments({ deviceId });
-    return Promise.resolve({ deviceData, count });
 }
 
 async function getTimeSeries(
@@ -122,11 +108,9 @@ async function getTimeSeries(
 }
 
 export default {
-    getAllDeviceData,
-    getMostRecentDeviceData,
+    getDeviceData,
     addDeviceData,
     removeDeviceData,
     exportToJson,
-    getBetween,
     getTimeSeries
 };

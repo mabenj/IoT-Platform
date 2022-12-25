@@ -4,28 +4,10 @@ import { GetDeviceTimeSeriesResponse } from "../../../interfaces/get-device-time
 
 async function getDeviceData(
     deviceId: string,
-    start?: number,
-    stop?: number
+    page: number
 ): Promise<GetDeviceDataResponse> {
     const response = await axios.get<GetDeviceDataResponse>(
-        `/api/deviceData/${deviceId}?start=${start}&stop=${stop}`
-    );
-    return {
-        ...response.data,
-        deviceData: response.data.deviceData.map((deviceDatum) => ({
-            ...deviceDatum,
-            createdAt: new Date(deviceDatum.createdAt)
-        }))
-    };
-}
-
-async function getDeviceDataByDate(
-    deviceId: string,
-    startDate: Date,
-    stopDate: Date
-): Promise<GetDeviceDataResponse> {
-    const response = await axios.get<GetDeviceDataResponse>(
-        `/api/deviceData/${deviceId}?startDate=${startDate.toISOString()}&endDate=${stopDate.toISOString()}`
+        `/api/deviceData/${deviceId}?page=${page || 1}`
     );
     return {
         ...response.data,
@@ -70,7 +52,6 @@ const DeviceDataService = {
     getDeviceData,
     deleteAllDeviceData,
     exportAllDeviceData,
-    getDeviceDataByDate,
     getDeviceTimeSeries
 };
 
