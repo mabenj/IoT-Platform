@@ -25,8 +25,9 @@ export default function ViewDeviceData() {
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [lastPage, setLastPage] = useState(currentPage);
+    const [totalPages, setTotalPages] = useState(currentPage);
     const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(1);
 
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
@@ -40,12 +41,22 @@ export default function ViewDeviceData() {
         }
 
         setIsFetchingData(true);
-        const { count, page, pages, deviceData } =
-            await DeviceDataService.getDeviceData(deviceId, pageToFetch);
-        setDeviceData(deviceData);
-        setCurrentPage(page);
-        setLastPage(pages);
-        setTotalDeviceDataCount(count);
+        const { pagination, items } = await DeviceDataService.getDeviceData(
+            deviceId,
+            pageToFetch
+        );
+        const {
+            // currentCount,
+            totalCount,
+            currentPage,
+            totalPages,
+            itemsPerPage
+        } = pagination;
+        setDeviceData(items);
+        setCurrentPage(currentPage);
+        setTotalPages(totalPages);
+        setTotalDeviceDataCount(totalCount);
+        setItemsPerPage(itemsPerPage);
         setIsFetchingData(false);
     };
 
@@ -68,8 +79,9 @@ export default function ViewDeviceData() {
         await DeviceDataService.deleteAllDeviceData(device?.id!).then(() => {
             setDeviceData([]);
             setCurrentPage(1);
-            setLastPage(1);
+            setTotalPages(1);
             setTotalDeviceDataCount(0);
+            setItemsPerPage(1);
         });
     };
 
@@ -79,6 +91,70 @@ export default function ViewDeviceData() {
 
     const goToPage = (page: number) => {
         fetchDeviceData(page);
+    };
+
+    const PaginatedList = () => {
+        const pageButtonsToDisplay = 10;
+
+        const padding = Math.floor(pageButtonsToDisplay / 2);
+        let startIndex = Math.max(1, currentPage - padding);
+        const endIndex = Math.min(
+            totalPages,
+            startIndex + pageButtonsToDisplay - 1
+        );
+
+        if (endIndex - padding < currentPage) {
+            startIndex -= Math.abs(endIndex - padding - currentPage + 1);
+            startIndex = startIndex <= 0 ? 1 : startIndex;
+        }
+
+        return (
+            <div className="d-flex align-items-center gap-3">
+                <Pagination>
+                    <Pagination.Prev
+                        disabled={currentPage <= 1}
+                        onClick={() => goToPage(currentPage - 1)}
+                    />
+
+                    {startIndex > 1 && (
+                        <>
+                            <Pagination.First onClick={() => goToPage(1)}>
+                                1
+                            </Pagination.First>
+                            <div className="mx-3 align-self-end">...</div>
+                        </>
+                    )}
+
+                    {Array.from(
+                        { length: endIndex - startIndex + 1 },
+                        (_, i) => i + startIndex
+                    ).map((pageNumber) => (
+                        <Pagination.Item
+                            key={pageNumber}
+                            active={currentPage === pageNumber}
+                            onClick={() => goToPage(pageNumber)}>
+                            {pageNumber}
+                        </Pagination.Item>
+                    ))}
+
+                    {endIndex < totalPages && (
+                        <>
+                            <div className="mx-3 align-self-end">...</div>
+                            <Pagination.Last
+                                onClick={() => goToPage(totalPages)}>
+                                {totalPages}
+                            </Pagination.Last>
+                        </>
+                    )}
+
+                    <Pagination.Next
+                        disabled={currentPage >= totalPages}
+                        onClick={() => goToPage(currentPage + 1)}
+                    />
+                </Pagination>
+                {isFetchingData && <Spinner size="sm" />}
+            </div>
+        );
     };
 
     const confirmDeletePopover = (
@@ -138,10 +214,14 @@ export default function ViewDeviceData() {
                         </Button>
                     </OverlayTrigger>
                 </div>
-                <small className="text-muted d-block mt-4">
-                    Showing {deviceData.length} out of {totalDeviceDataCount}{" "}
-                    entries
-                </small>
+                <div className="d-flex justify-content-between align-items-center mt-4">
+                    <small className="text-muted d-block">
+                        Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                        {(currentPage - 1) * itemsPerPage + deviceData.length}{" "}
+                        out of {totalDeviceDataCount} entries
+                    </small>
+                    {totalPages > 1 && <PaginatedList />}
+                </div>
                 {!isFetchingData &&
                     deviceData.map((data) => (
                         <DeviceDataCard key={data.id} data={data} />
@@ -159,31 +239,11 @@ export default function ViewDeviceData() {
                         <strong>{device.name}</strong>'
                     </Alert>
                 )}
-                {lastPage > 1 && (
-                    <Pagination>
-                        {/*TODO: return something like this from api 
-{
-  "pagination": {
-    "countCurrent": 0,
-    "countTotal": 0,
-    "pageCurrent": 0,
-    "pageTotal": 0,
-    "itemsPerPage": 0
-  },
-  "items": {}
-} */}
 
-                        {range(
-                            currentPage,
-                            Math.min(currentPage + 9, totalDeviceDataCount)
-                        ).map((pageNumber) => (
-                            <Pagination.Item
-                                key={pageNumber}
-                                active={pageNumber === currentPage}>
-                                {pageNumber}
-                            </Pagination.Item>
-                        ))}
-                    </Pagination>
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-center my-5">
+                        <PaginatedList />
+                    </div>
                 )}
             </Col>
         </div>
@@ -225,7 +285,7 @@ const DeviceDataCard = ({ data }: DeviceDataCardProps) => {
                 </Collapse>
             </Card.Body>
             <Card.Footer className="text-muted">
-                {timeAgo(data.createdAt)} ago
+                {timeAgo(data.createdAt)}
             </Card.Footer>
         </Card>
     );

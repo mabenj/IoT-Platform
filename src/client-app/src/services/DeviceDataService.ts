@@ -11,9 +11,9 @@ async function getDeviceData(
     );
     return {
         ...response.data,
-        deviceData: response.data.deviceData.map((deviceDatum) => ({
-            ...deviceDatum,
-            createdAt: new Date(deviceDatum.createdAt)
+        items: response.data.items.map((item) => ({
+            ...item,
+            createdAt: new Date(item.createdAt)
         }))
     };
 }

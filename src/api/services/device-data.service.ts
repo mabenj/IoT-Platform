@@ -25,10 +25,14 @@ async function getDeviceData(
         .exec();
     const count = await DeviceData.countDocuments({ deviceId });
     return {
-        count,
-        page,
-        pages: Math.ceil(count / ITEMS_PER_PAGE),
-        deviceData
+        pagination: {
+            currentCount: deviceData.length,
+            totalCount: count,
+            currentPage: page,
+            totalPages: Math.ceil(count / ITEMS_PER_PAGE),
+            itemsPerPage: ITEMS_PER_PAGE
+        },
+        items: deviceData
     };
 }
 
