@@ -7,33 +7,15 @@ async function getDeviceData(
         { deviceId: string },
         {},
         {},
-        { start?: number; stop?: number; startDate?: string; endDate?: string }
+        { page?: string }
     >,
     res: Response
 ) {
-    const { start, stop, startDate, endDate } = req.query;
+    const page = req.query.page ? +req.query.page : 1;
     try {
-        if (startDate && endDate) {
-            res.json(
-                await DeviceDataService.getBetween(
-                    req.params.deviceId,
-                    new Date(startDate),
-                    new Date(endDate)
-                )
-            );
-        } else if (start && stop) {
-            res.json(
-                await DeviceDataService.getMostRecentDeviceData(
-                    req.params.deviceId,
-                    req.query.start,
-                    req.query.stop
-                )
-            );
-        } else {
-            throw new Error("Missing parameters");
-        }
+        res.json(await DeviceDataService.getDeviceData(req.params.deviceId, page))
     } catch (error) {
-        res.status(400).send(getErrorMessage(error));
+        res.status(500).send(getErrorMessage(error));
     }
 }
 
@@ -58,8 +40,31 @@ async function deleteDeviceData(
     // res.status(204).send();
 }
 
+async function getDeviceTimeSeries(
+    req: Request<
+        { deviceId: string },
+        {},
+        {},
+        { start?: string; end?: string }
+    >,
+    res: Response
+) {
+    if (!req.query.start || !req.query.end) {
+        res.status(400).send("Missing params");
+        return;
+    }
+    res.json(
+        await DeviceDataService.getTimeSeries(
+            req.params.deviceId,
+            new Date(+req.query.start),
+            new Date(+req.query.end)
+        )
+    );
+}
+
 export default {
     getDeviceData,
     deleteDeviceData,
-    exportDeviceDataJson
+    exportDeviceDataJson,
+    getDeviceTimeSeries
 };

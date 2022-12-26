@@ -1,12 +1,6 @@
 import { format } from "date-fns";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import {
-    Badge,
-    ButtonGroup,
-    Modal,
-    OverlayTrigger,
-    Popover
-} from "react-bootstrap";
+import React, { useContext, useEffect, useState } from "react";
+import { OverlayTrigger, Pagination, Popover } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -15,93 +9,65 @@ import Collapse from "react-bootstrap/Collapse";
 import Placeholder from "react-bootstrap/Placeholder";
 import Spinner from "react-bootstrap/Spinner";
 import ReactJson from "react-json-view";
+import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
-import {
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from "recharts";
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
-import { TimeSeriesConfiguration } from "../../../interfaces/time-series-configuration.interface";
-import { useIsMobile } from "../hooks/useIsMobile";
 import DeviceDataService from "../services/DeviceDataService";
-import { generateHexColor, range, timeAgo } from "../utils/utils";
+import { range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
+import TimeSeriesGraph from "./TimeSeriesGraph";
 import HoverTooltip from "./ui/HoverTooltip";
-
-const CHUNK_SIZE = 200;
-
-const ALL_TIME_DAYS = Number.MAX_VALUE;
-const ONE_YEAR = 365;
-const ONE_MONTH = 30;
-const SIX_MONTHS = 6 * ONE_MONTH;
-const ONE_WEEK = 7;
 
 export default function ViewDeviceData() {
     const [device, setDevice] = useState<Device>();
-    const [deviceData, setDeviceData] = useState<Map<string, DeviceData>>(
-        new Map()
-    );
-    const [chunkIndexes, setChunkIndexes] = useState<[number, number]>([
-        0,
-        CHUNK_SIZE
-    ]);
-    const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
-    const [isFetchingData, setIsFetchingData] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(false);
+    const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(currentPage);
+    const [totalDeviceDataCount, setTotalDeviceDataCount] = useState(0);
+    const [itemsPerPage, setItemsPerPage] = useState(1);
+
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
 
-    const fetchDeviceDataChunk = useCallback(
-        async (deviceId: string) => {
-            if (
-                deviceData.size === totalDeviceDataCount &&
-                totalDeviceDataCount > 0
-            ) {
-                return;
-            }
-            setIsFetchingData(true);
-            const { deviceData: newDeviceData, count } =
-                await DeviceDataService.getDeviceData(
-                    deviceId,
-                    chunkIndexes[0],
-                    chunkIndexes[1]
-                );
-            setDeviceData((prev) => {
-                newDeviceData.forEach((data) => prev.set(data.id, data));
-                return prev;
-            });
-            setChunkIndexes((prev) => [
-                Math.min(prev[0] + CHUNK_SIZE + 1, count),
-                Math.min(prev[1] + CHUNK_SIZE + 1, count)
-            ]);
-            setTotalDeviceDataCount(count);
-            setIsFetchingData(false);
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+    const navigate = useNavigate();
 
-    const resolveDeviceAndData = useCallback(async () => {
+    const fetchDeviceData = async (pageToFetch: number) => {
+        if (!deviceId) {
+            setDeviceData([]);
+            return;
+        }
+
+        setIsFetchingData(true);
+        const { pagination, items } = await DeviceDataService.getDeviceData(
+            deviceId,
+            pageToFetch
+        );
+        const {
+            // currentCount,
+            totalCount,
+            currentPage,
+            totalPages,
+            itemsPerPage
+        } = pagination;
+        setDeviceData(items);
+        setCurrentPage(currentPage);
+        setTotalPages(totalPages);
+        setTotalDeviceDataCount(totalCount);
+        setItemsPerPage(itemsPerPage);
+        setIsFetchingData(false);
+    };
+
+    useEffect(() => {
         const currentDevice = devices.find(({ id }) => id === deviceId);
         if (currentDevice) {
             setDevice(currentDevice);
-            fetchDeviceDataChunk(currentDevice.id!);
+            fetchDeviceData(currentPage);
         }
-    }, [deviceId, devices, fetchDeviceDataChunk]);
-
-    useEffect(() => {
-        async function fetchDeviceAndData() {
-            resolveDeviceAndData();
-        }
-        fetchDeviceAndData();
-    }, [resolveDeviceAndData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deviceId, devices]);
 
     const exportData = async () => {
         setIsExporting(true);
@@ -110,32 +76,85 @@ export default function ViewDeviceData() {
     };
 
     const deleteAllData = async () => {
-        await DeviceDataService.deleteAllDeviceData(device?.id!);
-        setDeviceData(new Map());
-        setTotalDeviceDataCount(0);
+        await DeviceDataService.deleteAllDeviceData(device?.id!).then(() => {
+            setDeviceData([]);
+            setCurrentPage(1);
+            setTotalPages(1);
+            setTotalDeviceDataCount(0);
+            setItemsPerPage(1);
+        });
     };
 
-    const refreshData = async () => {
-        if (!device?.id) {
-            return;
+    const refresh = () => {
+        navigate(0);
+    };
+
+    const goToPage = (page: number) => {
+        fetchDeviceData(page);
+    };
+
+    const PaginatedList = () => {
+        const pageButtonsToDisplay = 10;
+
+        const padding = Math.floor(pageButtonsToDisplay / 2);
+        let startIndex = Math.max(1, currentPage - padding);
+        const endIndex = Math.min(
+            totalPages,
+            startIndex + pageButtonsToDisplay - 1
+        );
+
+        if (endIndex - padding < currentPage) {
+            startIndex -= Math.abs(endIndex - padding - currentPage + 1);
+            startIndex = startIndex <= 0 ? 1 : startIndex;
         }
-        setIsFetchingData(true);
-        const { deviceData: newDeviceData, count } =
-            await DeviceDataService.getDeviceData(
-                device.id,
-                chunkIndexes[0],
-                chunkIndexes[1]
-            );
-        setDeviceData((prev) => {
-            newDeviceData.forEach((data) => prev.set(data.id, data));
-            return prev;
-        });
-        setChunkIndexes((prev) => [
-            Math.min(prev[0] + CHUNK_SIZE + 1, count),
-            Math.min(prev[1] + CHUNK_SIZE + 1, count)
-        ]);
-        setTotalDeviceDataCount(count);
-        setIsFetchingData(false);
+
+        return (
+            <div className="d-flex align-items-center gap-3">
+                <Pagination>
+                    <Pagination.Prev
+                        disabled={currentPage <= 1}
+                        onClick={() => goToPage(currentPage - 1)}
+                    />
+
+                    {startIndex > 1 && (
+                        <>
+                            <Pagination.First onClick={() => goToPage(1)}>
+                                1
+                            </Pagination.First>
+                            <div className="mx-3 align-self-end">...</div>
+                        </>
+                    )}
+
+                    {Array.from(
+                        { length: endIndex - startIndex + 1 },
+                        (_, i) => i + startIndex
+                    ).map((pageNumber) => (
+                        <Pagination.Item
+                            key={pageNumber}
+                            active={currentPage === pageNumber}
+                            onClick={() => goToPage(pageNumber)}>
+                            {pageNumber}
+                        </Pagination.Item>
+                    ))}
+
+                    {endIndex < totalPages && (
+                        <>
+                            <div className="mx-3 align-self-end">...</div>
+                            <Pagination.Last
+                                onClick={() => goToPage(totalPages)}>
+                                {totalPages}
+                            </Pagination.Last>
+                        </>
+                    )}
+
+                    <Pagination.Next
+                        disabled={currentPage >= totalPages}
+                        onClick={() => goToPage(currentPage + 1)}
+                    />
+                </Pagination>
+                {isFetchingData && <Spinner size="sm" />}
+            </div>
+        );
     };
 
     const confirmDeletePopover = (
@@ -163,24 +182,16 @@ export default function ViewDeviceData() {
             <Col xl={10} xxl={8}>
                 {device?.hasTimeSeries &&
                     device.timeSeriesConfigurations.length > 0 && (
-                        <TimeSeriesGraph
-                            deviceData={Array.from(deviceData.values())}
-                            timeSeriesConfigs={
-                                device?.timeSeriesConfigurations || []
-                            }
-                            loading={isFetchingData}
-                        />
+                        <TimeSeriesGraph deviceId={device.id!} />
                     )}
                 <div className="mt-4 d-flex gap-2">
-                    <Button
-                        onClick={() => refreshData()}
-                        disabled={deviceData.size < 1 || isExporting}>
-                        <span className="mdi mdi-reload"></span> Refresh data
+                    <Button onClick={refresh} disabled={isExporting}>
+                        <span className="mdi mdi-reload"></span> Refresh
                     </Button>
                     <HoverTooltip tooltip="Export all device data as JSON">
                         <Button
-                            disabled={deviceData.size < 1 || isExporting}
-                            onClick={() => exportData()}>
+                            disabled={deviceData.length < 1 || isExporting}
+                            onClick={exportData}>
                             {isExporting ? (
                                 <Spinner
                                     animation="border"
@@ -190,25 +201,29 @@ export default function ViewDeviceData() {
                             ) : (
                                 <span className="mdi mdi-cloud-download"></span>
                             )}{" "}
-                            Export JSON
+                            Export to JSON
                         </Button>
                     </HoverTooltip>
                     <OverlayTrigger
                         trigger="focus"
                         placement="top"
                         overlay={confirmDeletePopover}>
-                        <Button disabled={deviceData.size < 1 || isExporting}>
+                        <Button disabled={deviceData.length < 1 || isExporting}>
                             <span className="mdi mdi-delete"></span> Delete All
                             Data
                         </Button>
                     </OverlayTrigger>
                 </div>
-                <small className="text-muted d-block mt-4">
-                    Showing {deviceData.size} out of {totalDeviceDataCount}{" "}
-                    entries
-                </small>
+                <div className="d-flex justify-content-between align-items-center mt-4">
+                    <small className="text-muted d-block">
+                        Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                        {(currentPage - 1) * itemsPerPage + deviceData.length}{" "}
+                        out of {totalDeviceDataCount} entries
+                    </small>
+                    {totalPages > 1 && <PaginatedList />}
+                </div>
                 {!isFetchingData &&
-                    Array.from(deviceData.values()).map((data) => (
+                    deviceData.map((data) => (
                         <DeviceDataCard key={data.id} data={data} />
                     ))}
                 {isFetchingData &&
@@ -218,330 +233,28 @@ export default function ViewDeviceData() {
                             <br />
                         </React.Fragment>
                     ))}
-                {!isFetchingData && deviceData.size === 0 && (
+                {device && !isFetchingData && deviceData.length === 0 && (
                     <Alert variant="warning" className="mt-5">
                         No device data exists for device '
-                        <strong>{device?.name}</strong>'
+                        <strong>{device.name}</strong>'
                     </Alert>
                 )}
-                {!isFetchingData && totalDeviceDataCount > deviceData.size && (
-                    <Alert variant="warning" className="mt-5">
-                        Only the first {deviceData.size} entries are shown
-                    </Alert>
+
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-center my-5">
+                        <PaginatedList />
+                    </div>
                 )}
             </Col>
         </div>
     );
 }
 
-interface TimeSeriesGraphProps {
-    deviceData: DeviceData[];
-    timeSeriesConfigs: TimeSeriesConfiguration[];
-    loading: boolean;
-}
-
-const TimeSeriesGraph = ({
-    deviceData,
-    timeSeriesConfigs,
-    loading
-}: TimeSeriesGraphProps) => {
-    const [showAsModal, setShowAsModal] = useState(false);
-    const isMobile = useIsMobile();
-    const [yAxisFields, setYAxisFields] = useState<string[]>([]);
-    const [units, setUnits] = useState<string[]>([]);
-    const [displayNames, setDisplayNames] = useState<string[]>([]);
-    const [formattedData, setFormattedData] = useState<Record<string, any>[]>(
-        []
-    );
-    const [scaleInDays, setScaleInDays] = useState(1);
-
-    useEffect(() => {
-        const yAxisFields = timeSeriesConfigs.map(
-            (config) => config.valueField
-        );
-        const units = timeSeriesConfigs.map((config) => config.unit);
-        const displayNames = timeSeriesConfigs.map(
-            (config) => config.displayName || config.valueField
-        );
-        setYAxisFields(yAxisFields);
-        setUnits(units);
-        setDisplayNames(displayNames);
-    }, [timeSeriesConfigs]);
-
-    useEffect(() => {
-        const formattedData = deviceData
-            .map(({ createdAt, data }) => {
-                let formatted: Record<string, any> = {
-                    timeStamp: createdAt.getTime()
-                };
-                yAxisFields.forEach(
-                    (field) => (formatted[field] = +data[field])
-                );
-                return formatted;
-            })
-            .reverse();
-        setFormattedData(formattedData);
-    }, [deviceData, yAxisFields]);
-
-    const setScale = (scaleInDays: number) => {
-        setScaleInDays(scaleInDays);
-        //TODO: fetch and set data
-    };
-
-    const formatTimestamp = (timestampMillis: number, longFormat?: boolean) => {
-        if (longFormat) {
-            return format(new Date(timestampMillis), "yyyy-MM-dd HH:mm");
-        }
-
-        //TODO: check distance between last and first timestamp instead of scale
-        if (scaleInDays <= 1) {
-            return format(new Date(timestampMillis), "HH:mm");
-        }
-        if (scaleInDays <= ONE_WEEK) {
-            return format(new Date(timestampMillis), "yyyy-MM-dd HH:mm");
-        }
-        if (scaleInDays <= ONE_MONTH) {
-            return format(new Date(timestampMillis), "yyyy-MM-dd");
-        }
-        if (scaleInDays <= SIX_MONTHS) {
-            return format(new Date(timestampMillis), "yyyy-MM-dd");
-        }
-        if (scaleInDays <= ONE_YEAR) {
-            return format(new Date(timestampMillis), "yyyy-MM-dd");
-        }
-        return format(new Date(timestampMillis), "yyyy-MM-dd");
-    };
-
-    if (loading) {
-        return (
-            <div className="w-100 d-flex align-items-center gap-3 my-6 mt-5">
-                <Spinner size="sm" /> Loading time series data...
-            </div>
-        );
-    }
-
-    if (deviceData.length === 0) {
-        return (
-            <Alert variant="warning" className="my-5">
-                No time series data available
-            </Alert>
-        );
-    }
-
-    const latestData = formattedData[formattedData.length - 1];
-
-    const CustomTick = (props: any) => {
-        const { x, y, payload } = props;
-
-        return (
-            <g transform={`translate(${x},${y})`}>
-                <text
-                    x={0}
-                    y={0}
-                    dy={16}
-                    textAnchor="end"
-                    fill="#666"
-                    transform="rotate(-35)">
-                    {formatTimestamp(payload.value)}
-                </text>
-            </g>
-        );
-    };
-
-    const Chart = () => (
-        <ResponsiveContainer width="100%" height={500} minWidth={500}>
-            <LineChart data={formattedData} margin={{ bottom: 80 }}>
-                <Line
-                    yAxisId={0}
-                    type="linear"
-                    dataKey={yAxisFields[0]}
-                    stroke={generateHexColor(yAxisFields[0])}
-                    strokeWidth={1.8}
-                    unit={" " + units[0]}
-                    legendType="plainline"
-                    name={displayNames[0]}
-                    dot={false}
-                />
-                <Line
-                    yAxisId={1}
-                    type="linear"
-                    dataKey={yAxisFields[1]}
-                    stroke={generateHexColor(yAxisFields[1])}
-                    strokeWidth={1.8}
-                    unit={" " + units[1]}
-                    legendType="plainline"
-                    name={displayNames[1]}
-                    dot={false}
-                />
-
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <XAxis
-                    dataKey="timeStamp"
-                    angle={-10}
-                    tickFormatter={(val) => formatTimestamp(val)}
-                    tick={<CustomTick />}
-                />
-                <YAxis
-                    yAxisId={0}
-                    label={{
-                        value: `${displayNames[0]} ${
-                            units[0] && `(${units[0]})`
-                        }`,
-                        angle: -90,
-                        position: "insideLeft",
-                        offset: 15
-                    }}
-                />
-                <YAxis
-                    yAxisId={1}
-                    label={{
-                        value: `${displayNames[1]} ${
-                            units[1] && `(${units[1]})`
-                        }`,
-                        angle: -90,
-                        position: "right",
-                        offset: -15
-                    }}
-                    orientation="right"
-                />
-                <Tooltip
-                    labelFormatter={(value) => formatTimestamp(value, true)}
-                />
-                <Legend verticalAlign="top" />
-            </LineChart>
-        </ResponsiveContainer>
-    );
-
-    const ScaleButtons = () => (
-        <div className="w-100 d-flex justify-content-center my-3">
-            <HoverTooltip tooltip="Scale of data">
-                <ButtonGroup vertical={isMobile}>
-                    <Button
-                        disabled
-                        variant="primary"
-                        onClick={() => setScale(ALL_TIME_DAYS)}
-                        active={scaleInDays === ALL_TIME_DAYS}>
-                        All time
-                    </Button>
-                    <Button
-                        disabled
-                        variant="primary"
-                        onClick={() => setScale(ONE_YEAR)}
-                        active={scaleInDays === ONE_YEAR}>
-                        1 year
-                    </Button>
-                    <Button
-                        disabled
-                        variant="primary"
-                        onClick={() => setScale(SIX_MONTHS)}
-                        active={scaleInDays === SIX_MONTHS}>
-                        6 months
-                    </Button>
-                    <Button
-                        disabled
-                        variant="primary"
-                        onClick={() => setScale(ONE_MONTH)}
-                        active={scaleInDays === ONE_MONTH}>
-                        1 month
-                    </Button>
-                    <Button
-                        disabled
-                        variant="primary"
-                        onClick={() => setScale(ONE_WEEK)}
-                        active={scaleInDays === ONE_WEEK}>
-                        1 week
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => setScale(1)}
-                        active={scaleInDays === 1}>
-                        24 hours
-                    </Button>
-                </ButtonGroup>
-            </HoverTooltip>
-        </div>
-    );
-
-    return (
-        <Card className="my-5">
-            <Card.Header>Time Series</Card.Header>
-            <Card.Body className="d-flex flex-column align-items-center">
-                <div className="iot-time-series-latest-value">
-                    <Card.Title>
-                        <div className="iot-time-series-title">
-                            Latest Value
-                        </div>
-                    </Card.Title>
-                    <Card.Subtitle className="iot-time-series-timestamp">
-                        <div className="text-muted text-center mb-2">
-                            {latestData &&
-                                timeAgo(new Date(latestData["timeStamp"]))}
-                        </div>
-                        <HoverTooltip tooltip="Timestamp">
-                            <span className="font-monospace">
-                                {latestData &&
-                                    formatTimestamp(
-                                        latestData["timeStamp"],
-                                        true
-                                    )}
-                            </span>
-                        </HoverTooltip>
-                    </Card.Subtitle>
-                    {range(0, 1).map((index) => (
-                        <div
-                            key={index}
-                            className={`iot-time-series-value${index + 1}`}>
-                            <HoverTooltip tooltip={`Data field ${index + 1}`}>
-                                <span className="font-monospace">
-                                    {displayNames[index]}
-                                </span>
-                            </HoverTooltip>
-                            <HoverTooltip
-                                tooltip={`Value of data field ${index + 1}`}>
-                                <Badge bg="secondary" className="ms-3 fs-6">
-                                    {latestData
-                                        ? latestData[yAxisFields[index]]
-                                        : null}
-                                    {latestData && units[index]
-                                        ? " " + units[index]
-                                        : null}
-                                </Badge>
-                            </HoverTooltip>
-                        </div>
-                    ))}
-                </div>
-                <div className="w-100 h-100 mt-2 d-flex justify-content-center">
-                    {isMobile ? (
-                        <Button onClick={() => setShowAsModal(true)}>
-                            <span className="mdi mdi-launch"></span> Show graph
-                        </Button>
-                    ) : (
-                        <Chart />
-                    )}
-                    <Modal
-                        show={showAsModal}
-                        fullscreen="md-down"
-                        onHide={() => setShowAsModal(false)}>
-                        <Modal.Header closeButton>
-                            Time Series Graph
-                        </Modal.Header>
-                        <Modal.Body>
-                            <Chart />
-                            <ScaleButtons />
-                        </Modal.Body>
-                    </Modal>
-                </div>
-                {!isMobile && <ScaleButtons />}
-            </Card.Body>
-        </Card>
-    );
-};
-
-interface DeviceDataProps {
+interface DeviceDataCardProps {
     data: DeviceData;
 }
 
-const DeviceDataCard = ({ data }: DeviceDataProps) => {
+const DeviceDataCard = ({ data }: DeviceDataCardProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -572,7 +285,7 @@ const DeviceDataCard = ({ data }: DeviceDataProps) => {
                 </Collapse>
             </Card.Body>
             <Card.Footer className="text-muted">
-                {timeAgo(data.createdAt)} ago
+                {timeAgo(data.createdAt)}
             </Card.Footer>
         </Card>
     );

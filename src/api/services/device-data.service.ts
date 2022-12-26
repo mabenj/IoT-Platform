@@ -1,32 +1,39 @@
 import { DeviceData as DeviceDataInterface } from "../../interfaces/device-data.interface";
+import { Device as IDevice } from "../../interfaces/device.interface";
 import { GetDeviceDataResponse } from "../../interfaces/get-device-data-response.interface";
+import { GetDeviceTimeSeriesResponse } from "../../interfaces/get-device-time-series-response.interface";
 import DeviceData from "../models/device-data.model";
+import Device from "../models/device.model";
 import { getDateString } from "../utils/utils";
 import DeviceService from "./device.service";
 
-async function getAllDeviceData(
-    deviceId: string
-): Promise<GetDeviceDataResponse> {
+const ITEMS_PER_PAGE = 20;
+
+async function getAllDeviceData(deviceId: string) {
     const deviceData = (await DeviceData.find({ deviceId }).exec()) || [];
     return Promise.resolve({ deviceData, count: deviceData.length });
 }
 
-async function getMostRecentDeviceData(
+async function getDeviceData(
     deviceId: string,
-    start?: number,
-    stop?: number
+    page: number
 ): Promise<GetDeviceDataResponse> {
-    if (start && stop) {
-        const deviceData =
-            (await DeviceData.find({ deviceId })
-                .sort({ createdAt: -1 })
-                .limit(stop)
-                .skip(start)
-                .exec()) || [];
-        const count = await DeviceData.countDocuments({ deviceId });
-        return Promise.resolve({ deviceData, count });
-    }
-    return getAllDeviceData(deviceId);
+    const deviceData = await DeviceData.find({ deviceId })
+        .sort({ createdAt: -1 })
+        .skip(ITEMS_PER_PAGE * (page - 1))
+        .limit(ITEMS_PER_PAGE)
+        .exec();
+    const count = await DeviceData.countDocuments({ deviceId });
+    return {
+        pagination: {
+            currentCount: deviceData.length,
+            totalCount: count,
+            currentPage: page,
+            totalPages: Math.ceil(count / ITEMS_PER_PAGE),
+            itemsPerPage: ITEMS_PER_PAGE
+        },
+        items: deviceData
+    };
 }
 
 async function addDeviceData(
@@ -57,25 +64,57 @@ async function exportToJson(deviceId: string) {
     return { json, filename };
 }
 
-async function getBetween(
+async function getTimeSeries(
     deviceId: string,
-    startDate: Date,
-    endDate: Date
-): Promise<GetDeviceDataResponse> {
-    const deviceData =
-        (await DeviceData.find({ deviceId })
-            .sort({ createdAt: -1 })
-            .find({ createdAt: { $gte: startDate, $lt: endDate } })
+    start: Date,
+    end: Date
+): Promise<GetDeviceTimeSeriesResponse> {
+    const device: IDevice | null = await Device.findById(deviceId);
+    if (!device || !device.hasTimeSeries) {
+        return {
+            count: 0,
+            displayNames: [],
+            units: [],
+            timestamps: [],
+            timeSeriesValues: []
+        };
+    }
+
+    const valueFields = device.timeSeriesConfigurations.map(
+        (config) => config.valueField
+    );
+    const displayNames = device.timeSeriesConfigurations.map(
+        (config) => config.displayName
+    );
+    const units = device.timeSeriesConfigurations.map((config) => config.unit);
+
+    const selectionString = valueFields
+        .map((field) => `data.${field}`)
+        .join(" ");
+    const timeSeriesData =
+        (await DeviceData.find({
+            deviceId: device.id,
+            createdAt: { $gte: start, $lt: end }
+        })
+            .select(`createdAt ${selectionString}`)
+            .sort({ createdAt: 1 })
             .exec()) || [];
     const count = await DeviceData.countDocuments({ deviceId });
-    return Promise.resolve({ deviceData, count });
+    return {
+        count,
+        displayNames: displayNames,
+        units: units,
+        timestamps: timeSeriesData.map((tsData) => tsData.createdAt.getTime()),
+        timeSeriesValues: valueFields.map((vf) =>
+            timeSeriesData.map((tsData) => tsData.data[vf])
+        )
+    };
 }
 
 export default {
-    getAllDeviceData,
-    getMostRecentDeviceData,
+    getDeviceData,
     addDeviceData,
     removeDeviceData,
     exportToJson,
-    getBetween
+    getTimeSeries
 };
