@@ -53,7 +53,7 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const [displayNames, setDisplayNames] = useState<string[]>([]);
     const [timestamps, setTimestamps] = useState<number[]>([]);
     const [timeSeriesValues, setTimeSeriesValues] = useState<any[][]>([]);
-    const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneDay);
+    const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneWeek);
     const [isFetchingData, setIsFetchingData] = useState(false);
 
     const latestTimestamp = timestamps[timestamps.length - 1];
