@@ -56,8 +56,10 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneDay);
     const [isFetchingData, setIsFetchingData] = useState(false);
 
-    const latestTimestamp = timestamps[0];
-    const latestValues = timeSeriesValues.map((tsValues) => tsValues[0]);
+    const latestTimestamp = timestamps[timestamps.length - 1];
+    const latestValues = timeSeriesValues.map(
+        (tsValues) => tsValues[tsValues.length - 1]
+    );
 
     const fetchTimeSeries = useCallback(
         async (daysToTake: number) => {
