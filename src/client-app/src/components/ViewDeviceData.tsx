@@ -13,6 +13,7 @@ import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import { DeviceData } from "../../../interfaces/device-data.interface";
 import { Device } from "../../../interfaces/device.interface";
+import { useIsMobile } from "../hooks/useIsMobile";
 import DeviceDataService from "../services/DeviceDataService";
 import { range, timeAgo } from "../utils/utils";
 import { DevicesContext } from "./App";
@@ -31,6 +32,8 @@ export default function ViewDeviceData() {
 
     const { devices } = useContext(DevicesContext) || { devices: [] };
     const { deviceId } = useParams();
+
+    const isMobile = useIsMobile();
 
     const navigate = useNavigate();
 
@@ -94,7 +97,7 @@ export default function ViewDeviceData() {
     };
 
     const PaginatedList = () => {
-        const pageButtonsToDisplay = 10;
+        const pageButtonsToDisplay = isMobile ? 3 : 5;
 
         const padding = Math.floor(pageButtonsToDisplay / 2);
         let startIndex = Math.max(1, currentPage - padding);
@@ -109,14 +112,14 @@ export default function ViewDeviceData() {
         }
 
         return (
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-flex gap-3 ">
                 <Pagination>
                     <Pagination.Prev
                         disabled={currentPage <= 1}
                         onClick={() => goToPage(currentPage - 1)}
                     />
 
-                    {startIndex > 1 && (
+                    {startIndex > 1 && !isMobile && (
                         <>
                             <Pagination.First onClick={() => goToPage(1)}>
                                 1
@@ -137,7 +140,7 @@ export default function ViewDeviceData() {
                         </Pagination.Item>
                     ))}
 
-                    {endIndex < totalPages && (
+                    {endIndex < totalPages && !isMobile && (
                         <>
                             <div className="mx-3 align-self-end">...</div>
                             <Pagination.Last
@@ -152,7 +155,8 @@ export default function ViewDeviceData() {
                         onClick={() => goToPage(currentPage + 1)}
                     />
                 </Pagination>
-                {isFetchingData && <Spinner size="sm" />}
+
+                {isFetchingData && <Spinner size="sm" className="mt-2" />}
             </div>
         );
     };
@@ -214,7 +218,7 @@ export default function ViewDeviceData() {
                         </Button>
                     </OverlayTrigger>
                 </div>
-                <div className="d-flex justify-content-between align-items-center mt-4">
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mt-4 mx-1">
                     <small className="text-muted d-block">
                         Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
                         {(currentPage - 1) * itemsPerPage + deviceData.length}{" "}
