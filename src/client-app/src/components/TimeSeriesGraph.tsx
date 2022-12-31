@@ -52,7 +52,7 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const [units, setUnits] = useState<string[]>([]);
     const [displayNames, setDisplayNames] = useState<string[]>([]);
     const [timestamps, setTimestamps] = useState<number[]>([]);
-    const [timeSeriesValues, setTimeSeriesValues] = useState<any[][]>([]);
+    const [timeSeriesValues, setTimeSeriesValues] = useState<unknown[][]>([]);
     const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneWeek);
     const [isFetchingData, setIsFetchingData] = useState(false);
 
@@ -145,6 +145,8 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const CustomTick = (props: any) => {
         const { x, y, payload } = props;
 
+        const angle = showAsModal ? -45 : -20;
+
         return (
             <g transform={`translate(${x},${y})`}>
                 <text
@@ -153,121 +155,140 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                     dy={16}
                     textAnchor="end"
                     fill="#666"
-                    transform="rotate(-20)">
+                    transform={`rotate(${angle})`}>
                     {formatTimestamp(payload.value)}
                 </text>
             </g>
         );
     };
 
-    const Chart = () => (
-        <ResponsiveContainer width="100%" height={500} minWidth={500}>
-            <LineChart
-                data={timestamps.map((ts, i) => ({
-                    timestamp: ts,
-                    value0: timeSeriesValues[0][i],
-                    value1: timeSeriesValues[1][i]
-                }))}
-                margin={{ bottom: 80 }}>
-                <Line
-                    yAxisId="line0"
-                    unit={units[0] ? " " + units[0] : undefined}
-                    name={displayNames[0]}
-                    dataKey="value0"
-                    type="linear"
-                    stroke={pickElement(LINE_COLOR_PALETTE, displayNames[0])}
-                    strokeWidth={1.8}
-                    legendType="plainline"
-                    dot={false}
-                />
-                <Line
-                    yAxisId="line1"
-                    unit={units[1] ? " " + units[1] : undefined}
-                    name={displayNames[1]}
-                    dataKey="value1"
-                    type="linear"
-                    stroke={pickElement(LINE_COLOR_PALETTE, displayNames[1])}
-                    strokeWidth={1.8}
-                    legendType="plainline"
-                    dot={false}
-                />
-                <YAxis
-                    yAxisId="line0"
-                    label={{
-                        value: `${displayNames[0]} ${
-                            units[0] && `(${units[0]})`
-                        }`,
-                        angle: -90,
-                        position: "insideLeft",
-                        offset: 15
-                    }}
-                />
-                <YAxis
-                    yAxisId="line1"
-                    label={{
-                        value: `${displayNames[1]} ${
-                            units[1] && `(${units[1]})`
-                        }`,
-                        angle: -90,
-                        position: "right",
-                        offset: -15
-                    }}
-                    orientation="right"
-                />
-                <XAxis
-                    dataKey="timestamp"
-                    angle={-10}
-                    tickFormatter={(val) => formatTimestamp(val)}
-                    tick={<CustomTick />}
-                    domain={["auto", "auto"]}
-                    type="number"
-                />
+    const Chart = () => {
+        const getYLabel = (axisIndex: number, right?: boolean) =>
+            showAsModal
+                ? {
+                      value: units[axisIndex]
+                          ? units[axisIndex]
+                          : displayNames[axisIndex],
+                      position: "top",
+                      offset: 15
+                  }
+                : {
+                      value: `${displayNames[axisIndex]} ${
+                          units[axisIndex] && `(${units[axisIndex]})`
+                      }`,
+                      angle: -90,
+                      position: right ? "right" : "insideLeft",
+                      offset: right ? -15 : 15
+                  };
 
-                <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-                <Tooltip
-                    labelFormatter={(value) => formatTimestamp(value, true)}
-                />
-                <Legend verticalAlign="top" />
-            </LineChart>
-        </ResponsiveContainer>
-    );
+        return (
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                    data={timestamps.map((ts, i) => ({
+                        timestamp: ts,
+                        value0: timeSeriesValues[0][i],
+                        value1: timeSeriesValues[1][i]
+                    }))}
+                    margin={{ bottom: 80, top: 30 }}>
+                    <Line
+                        yAxisId="line0"
+                        unit={units[0] ? " " + units[0] : undefined}
+                        name={displayNames[0]}
+                        dataKey="value0"
+                        type="linear"
+                        stroke={pickElement(
+                            LINE_COLOR_PALETTE,
+                            displayNames[0]
+                        )}
+                        strokeWidth={1.8}
+                        legendType="plainline"
+                        dot={false}
+                    />
+                    <Line
+                        yAxisId="line1"
+                        unit={units[1] ? " " + units[1] : undefined}
+                        name={displayNames[1]}
+                        dataKey="value1"
+                        type="linear"
+                        stroke={pickElement(
+                            LINE_COLOR_PALETTE,
+                            displayNames[1]
+                        )}
+                        strokeWidth={1.8}
+                        legendType="plainline"
+                        dot={false}
+                    />
+                    <YAxis
+                        yAxisId="line0"
+                        width={showAsModal ? 30 : 60}
+                        label={getYLabel(0)}
+                    />
+                    <YAxis
+                        yAxisId="line1"
+                        width={showAsModal ? 30 : 60}
+                        label={getYLabel(1, true)}
+                        orientation="right"
+                    />
+                    <XAxis
+                        dataKey="timestamp"
+                        tickFormatter={(val) => formatTimestamp(val)}
+                        tick={<CustomTick />}
+                        domain={["auto", "auto"]}
+                        type="number"
+                    />
+
+                    <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+                    <Tooltip
+                        labelFormatter={(value) => formatTimestamp(value, true)}
+                    />
+                    <Legend verticalAlign="top" />
+                </LineChart>
+            </ResponsiveContainer>
+        );
+    };
 
     const ZoomLevelButtons = () => (
         <div className="w-100 d-flex justify-content-center my-3">
             <HoverTooltip tooltip="Scale of data">
-                <ButtonGroup vertical={isMobile}>
+                <ButtonGroup>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.allTime)}
                         active={zoomLevel === ZOOM_LEVELS.allTime}>
                         All time
                     </Button>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.oneYear)}
                         active={zoomLevel === ZOOM_LEVELS.oneYear}>
                         1 year
                     </Button>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.sixMonths)}
                         active={zoomLevel === ZOOM_LEVELS.sixMonths}>
                         6 months
                     </Button>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.oneMonth)}
                         active={zoomLevel === ZOOM_LEVELS.oneMonth}>
                         1 month
                     </Button>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.oneWeek)}
                         active={zoomLevel === ZOOM_LEVELS.oneWeek}>
                         1 week
                     </Button>
                     <Button
                         variant="primary"
+                        size="sm"
                         onClick={() => changeZoomLevel(ZOOM_LEVELS.oneDay)}
                         active={zoomLevel === ZOOM_LEVELS.oneDay}>
                         24 hours
@@ -311,8 +332,12 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                             <HoverTooltip
                                 tooltip={`Value of data field ${i + 1}`}>
                                 <Badge bg="secondary" className="ms-3 fs-6">
-                                    {value}
-                                    {value && units[i] ? " " + units[i] : null}
+                                    <>
+                                        {value}
+                                        {value && units[i]
+                                            ? " " + units[i]
+                                            : null}
+                                    </>
                                 </Badge>
                             </HoverTooltip>
                         </div>
@@ -324,7 +349,9 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                             <span className="mdi mdi-launch"></span> Show graph
                         </Button>
                     ) : (
-                        <Chart />
+                        <div style={{ height: "500px", width: "100%" }}>
+                            <Chart />
+                        </div>
                     )}
                     <Modal
                         show={showAsModal}
