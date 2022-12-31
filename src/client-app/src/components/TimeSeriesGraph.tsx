@@ -233,7 +233,8 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                         dataKey="timestamp"
                         tickFormatter={(val) => formatTimestamp(val)}
                         tick={<CustomTick />}
-                        domain={["auto", "auto"]}
+                        tickCount={80}
+                        domain={["dataMin", "dataMax"]}
                         type="number"
                     />
 
