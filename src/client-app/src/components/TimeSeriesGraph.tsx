@@ -362,8 +362,10 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
                             Time Series Graph
                         </Modal.Header>
                         <Modal.Body>
-                            <Chart />
-                            <ZoomLevelButtons />
+                            <div className="d-flex flex-column h-100">
+                                <Chart />
+                                <ZoomLevelButtons />
+                            </div>
                         </Modal.Body>
                     </Modal>
                 </div>
