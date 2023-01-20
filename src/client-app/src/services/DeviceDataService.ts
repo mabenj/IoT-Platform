@@ -45,7 +45,12 @@ async function getDeviceTimeSeries(deviceId: string, start: Date, end: Date) {
     const response = await axios.get<GetDeviceTimeSeriesResponse>(
         `/api/deviceData/${deviceId}/timeSeries?start=${start.getTime()}&end=${end.getTime()}`
     );
-    return response.data;
+    return {
+        ...response.data,
+        timeSeriesValues: response.data.timeSeriesValues.map((values) =>
+            values.map((value) => +value)
+        )
+    } as GetDeviceTimeSeriesResponse;
 }
 
 const DeviceDataService = {
