@@ -136,7 +136,11 @@ export default function ViewDeviceData() {
                             key={pageNumber}
                             active={currentPage === pageNumber}
                             onClick={() => goToPage(pageNumber)}>
-                            {pageNumber}
+                            {currentPage === pageNumber && isFetchingData ? (
+                                <div className="mdi mdi-loading spin"></div>
+                            ) : (
+                                pageNumber
+                            )}
                         </Pagination.Item>
                     ))}
 
@@ -155,8 +159,6 @@ export default function ViewDeviceData() {
                         onClick={() => goToPage(currentPage + 1)}
                     />
                 </Pagination>
-
-                {isFetchingData && <Spinner size="sm" className="mt-2" />}
             </div>
         );
     };

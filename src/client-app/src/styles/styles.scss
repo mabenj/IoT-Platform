@@ -28,6 +28,16 @@ a {
     text-decoration: none;
 }
 
+.spin {
+    animation: rotate 0.5s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .iot-sidebar {
     height: 100vh;
     position: fixed;
