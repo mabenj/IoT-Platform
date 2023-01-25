@@ -13,9 +13,12 @@ const DIVISIONS = [
 ];
 
 export function timeAgo(date: Date) {
+    if (!date) {
+        return undefined;
+    }
     let duration = (date.getTime() - new Date().getTime()) / 1000;
 
-    for (let i = 0; i <= DIVISIONS.length; i++) {
+    for (let i = 0; i < DIVISIONS.length; i++) {
         const division = DIVISIONS[i];
         if (Math.abs(duration) < division.amount) {
             return FORMATTER.format(

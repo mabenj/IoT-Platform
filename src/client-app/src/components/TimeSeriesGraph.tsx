@@ -1,7 +1,7 @@
 import { differenceInDays, format, subMinutes } from "date-fns";
 import { subDays } from "date-fns/esm";
 import { useCallback, useEffect, useState } from "react";
-import { Badge, ButtonGroup, Modal } from "react-bootstrap";
+import { Badge, ButtonGroup, Modal, Placeholder } from "react-bootstrap";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -55,11 +55,6 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     const [timeSeriesValues, setTimeSeriesValues] = useState<unknown[][]>([]);
     const [zoomLevel, setZoomLevel] = useState(ZOOM_LEVELS.oneWeek);
     const [isFetchingData, setIsFetchingData] = useState(false);
-
-    const latestTimestamp = timestamps[timestamps.length - 1];
-    const latestValues = timeSeriesValues.map(
-        (tsValues) => tsValues[tsValues.length - 1]
-    );
 
     const fetchTimeSeries = useCallback(
         async (daysToTake: number) => {
@@ -299,51 +294,72 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
         </div>
     );
 
+    const LatestValue = ({
+        timestamp,
+        values
+    }: {
+        timestamp: number;
+        values: unknown[];
+    }) => {
+        const [timestampAgo, setTimestampAgo] = useState("");
+
+        useEffect(() => {
+            const interval = setInterval(() => {
+                setTimestampAgo(timeAgo(new Date(timestamp)) || "");
+            }, 1000);
+            return () => clearInterval(interval);
+        }, [timestamp]);
+
+        return (
+            <div className="iot-time-series-latest-value">
+                <Card.Title>
+                    <div className="iot-time-series-title">Latest Value</div>
+                </Card.Title>
+                <Card.Subtitle className="iot-time-series-timestamp">
+                    <div className="text-muted text-center mb-2">
+                        {timestampAgo || <Placeholder xs={5} />}
+                    </div>
+                    <HoverTooltip tooltip="Timestamp">
+                        <span className="font-monospace">
+                            {timestamp ? (
+                                formatTimestamp(timestamp, true)
+                            ) : (
+                                <Placeholder xs={9} />
+                            )}
+                        </span>
+                    </HoverTooltip>
+                </Card.Subtitle>
+                {values.map((value, i) => (
+                    <div key={i} className={`iot-time-series-value${i + 1}`}>
+                        <HoverTooltip tooltip={`Data field ${i + 1}`}>
+                            <span className="font-monospace">
+                                {displayNames[i]}
+                            </span>
+                        </HoverTooltip>
+                        <HoverTooltip tooltip={`Value of data field ${i + 1}`}>
+                            <Badge bg="secondary" className="ms-3 fs-6">
+                                <>
+                                    {value}
+                                    {value && units[i] ? " " + units[i] : null}
+                                </>
+                            </Badge>
+                        </HoverTooltip>
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <Card className="my-5">
             <Card.Header>Time Series</Card.Header>
             <Card.Body className="d-flex flex-column align-items-center">
-                <div className="iot-time-series-latest-value">
-                    <Card.Title>
-                        <div className="iot-time-series-title">
-                            Latest Value
-                        </div>
-                    </Card.Title>
-                    <Card.Subtitle className="iot-time-series-timestamp">
-                        <div className="text-muted text-center mb-2">
-                            {latestTimestamp &&
-                                timeAgo(new Date(latestTimestamp))}
-                        </div>
-                        <HoverTooltip tooltip="Timestamp">
-                            <span className="font-monospace">
-                                {latestTimestamp &&
-                                    formatTimestamp(latestTimestamp, true)}
-                            </span>
-                        </HoverTooltip>
-                    </Card.Subtitle>
-                    {latestValues.map((value, i) => (
-                        <div
-                            key={i}
-                            className={`iot-time-series-value${i + 1}`}>
-                            <HoverTooltip tooltip={`Data field ${i + 1}`}>
-                                <span className="font-monospace">
-                                    {displayNames[i]}
-                                </span>
-                            </HoverTooltip>
-                            <HoverTooltip
-                                tooltip={`Value of data field ${i + 1}`}>
-                                <Badge bg="secondary" className="ms-3 fs-6">
-                                    <>
-                                        {value}
-                                        {value && units[i]
-                                            ? " " + units[i]
-                                            : null}
-                                    </>
-                                </Badge>
-                            </HoverTooltip>
-                        </div>
-                    ))}
-                </div>
+                <LatestValue
+                    timestamp={timestamps[timestamps.length - 1]}
+                    values={timeSeriesValues.map(
+                        (tsValues) => tsValues[tsValues.length - 1]
+                    )}
+                />
                 <div className="w-100 h-100 mt-2 d-flex justify-content-center">
                     {isMobile ? (
                         <Button onClick={() => setShowAsModal(true)}>
