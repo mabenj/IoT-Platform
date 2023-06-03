@@ -85,6 +85,12 @@ export default function TimeSeriesGraph({ deviceId }: TimeSeriesGraphProps) {
     }, []);
 
     const formatTimestamp = (timestampMillis: number, longFormat?: boolean) => {
+        if (
+            Math.abs(timestampMillis) === Number.POSITIVE_INFINITY ||
+            isNaN(timestampMillis)
+        ) {
+            return "unknown";
+        }
         if (typeof timestampMillis !== "number") {
             return format(new Date(), "yyyy-MM-dd HH:mm");
         }
